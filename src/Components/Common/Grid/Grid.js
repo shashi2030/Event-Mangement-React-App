@@ -49,10 +49,23 @@ class Grid extends Component {
 
     findSelectedId =(id)=>{
          let selectedUserList = this.props.tempMember;
-         let matchData = selectedUserList.filter((val,ind)=>val['id']==id);
-         return matchData.length
+         let matchData = selectedUserList.findIndex(val => val['id']==id);
+         return matchData === -1?false:true;
     }
-    
+
+    selectedAll = () =>{
+        let currentPageData = this.props.data;
+        let selectedLength = 0;
+        for(let i = 0; i < currentPageData.length;i++){
+           if(!this.findSelectedId(currentPageData[i].id)){
+                break;
+           }
+           selectedLength++;
+        }
+
+        return selectedLength === currentPageData.length ? true:false;
+    }
+
     /**
      * render to html
      * @param {null}
@@ -85,7 +98,7 @@ class Grid extends Component {
                                 {
                                     this.props.colDef && Object.values(this.props.colDef).map((value, index) => {
                                         if(value['label'] === 'Select'){                                            
-                                            return <th key={index} className={value['class']}><input type="checkbox"checked={this.selectedAll} onClick={(e)=>this.props.selectAll(e)} />{value['label']}</th>
+                                            return <th key={index} className={value['class']}><input type="checkbox" checked={this.selectedAll()} onChange={(e)=>this.props.selectAll(e)} />{value['label']}</th>
                                         }
                                         return <th key={index} className={value['class']}>{value['label']}</th>                                        
                                     })
@@ -97,7 +110,7 @@ class Grid extends Component {
                                 return <tr key={index}>
                                     {this.props.colDef && Object.keys(this.props.colDef).map((val, ind) => {                                        
                                          if (val === 'select') {
-                                             return <td key={ind}><input type="checkbox" checked={this.findSelectedId(value.id)} id={value.id} onClick={(e)=>this.props.selectUser(e,value.id,value.username)} /></td>
+                                             return <td key={ind}><input type="checkbox" checked={this.findSelectedId(value.id)} id={value.id} onChange={(e)=>this.props.selectUser(e,value.id,value.username)} /></td>
                                          }
                                         if (val === 'options') {
                                             return <td key={ind}><ButtonGroup>

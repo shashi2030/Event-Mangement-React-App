@@ -5,13 +5,14 @@
  * @author Shashi Kapoor Singh
  */
 import React, { Component } from 'react';
-import { Row, Col, Button, Form, FormGroup, Label, Input, FormFeedback, Modal, ModalHeader, ModalFooter, ModalBody } from 'reactstrap';
+import { Row, Col, Button, Form, FormGroup, Label, Input, FormFeedback} from 'reactstrap';
 import { Layout } from '../../Common/Layout/Layout';
 import { eventActions } from '../../../actions/event.actions';
 import Grid from '../../Common/Grid/Grid';
 import { userActions } from '../../../actions/users.actions'
 import BreadCrumb from '../../Common/Breadcrumb/Breadcrumb';
 import { AlertBox } from '../../Common/AlertBox/AlertBox';
+import {ModalPopup} from '../../Common/ModalPopup/ModalPopup';
 require('./css/createevent.css');
 /**
  * Define Constant of Table column Definition
@@ -145,11 +146,19 @@ class CreateEvent extends Component {
         this.props.history.push('/listevent');
     }
 
-    addMember = () => {
-        this.setState({
-            modal: true
-        }); 
-        this.userAPICall();       
+    addMember = (type) => {
+        switch(type){
+            case 'member':
+                this.setState({
+                    modal: true
+                }); 
+                this.userAPICall();  
+            break;
+            case 'vendor':
+
+            break;
+        }
+             
     }
 
     /**
@@ -176,13 +185,36 @@ class CreateEvent extends Component {
     }
 
     /**
+     * Description: userAPICall function to fetch all user data based on parameter
+     * @param  {null}
+     * @return {null}
+     */
+    vendorAPICall = () => {
+        let data = {
+            pageNo: this.state.currentPage,
+            pageLimit: this.state.countPerPage
+        }
+        userActions
+            .listUser(data)
+            .then(response => {
+                this.setState({
+                    data: response.data,
+                    totalDataCount: response.headers["x-total-count"]
+                })
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    /**
      * Description: Close Popup Model
      * @param {null}
      * @return {null}
      */
     closeModal = () => {
         this.setState({
-            modal: !this.state.modal
+            modal: false
         })
     }
 
@@ -228,11 +260,7 @@ class CreateEvent extends Component {
     selectUser = (e,id,name) =>{
         var selectMember = [...this.state.tempMember];       
         if(!e.target.checked){
-            let checkedIndex = selectMember.filter((val,index)=>{
-                if(val.id == id){
-                    return val
-                }
-            });
+            var checkedIndex = selectMember.findIndex(val => val.id==id);
             selectMember.splice(checkedIndex,1);
             this.setState({
                 tempMember: selectMember
@@ -242,7 +270,7 @@ class CreateEvent extends Component {
             this.setState({
                 tempMember: selectMember
             })
-        }     
+        }  
     }
 
     addSelectedMember = () =>{
@@ -252,12 +280,20 @@ class CreateEvent extends Component {
         })
     }
 
+    findData = (arr,key) =>{
+        return arr.findIndex(val=>{
+            return val.id === key
+        })
+    }
+
     selectAll = (e) =>{
         let allUser = [...this.state.data];
         let tempMemberData = [...this.state.tempMember];        
-        if(e.target.checked){
+        if(e.target.checked){            
             allUser.filter((value,index)=>{
+               if(this.findData(tempMemberData,value.id) === -1){
                 tempMemberData.push({"id":value.id,"username":value.username});
+               }               
             })
             this.setState({
                 ...this.state,
@@ -338,7 +374,7 @@ class CreateEvent extends Component {
                             <FormGroup row>
                                 <Label for="members" sm={3}>Members</Label>
                                 <Col sm={9}>
-                                    <button type="button" onClick={this.addMember}><i className="fa fa-user-plus" aria-hidden="true"></i></button>                                    
+                                    <button type="button" onClick={()=>this.addMember('member')}><i className="fa fa-user-plus" aria-hidden="true"></i></button>                                    
                                         <ul className="member-list">
                                             {
                                                 this.state.members && this.state.members.map((value,index)=>{
@@ -390,29 +426,27 @@ class CreateEvent extends Component {
                     </Col>
                 </Row>
 
-                <Modal isOpen={this.state.modal} toggle={this.toggle} className="modal-dialog modal-dialog-centered modal-xl">
-                    <ModalHeader>Member List</ModalHeader>
-                    <ModalBody>
-                        <Grid
-                            data={this.state.data}
-                            tempMember = {this.state.tempMember}
-                            colDef={colDef}
-                            currentPage={this.state.currentPage}
-                            countPerPage={this.state.countPerPage}
-                            pagingClick={this.pagingClick}
-                            totalDataCount={this.state.totalDataCount}
-                            nextPage={this.nextPage}
-                            prevPage={this.prevPage}
-                            actionType={this.actionType}
-                            selectUser = {this.selectUser}
-                            selectAll = {this.selectAll}
-                        />
-                    </ModalBody>
-                    <ModalFooter>
-                    <Button color="primary" onClick={this.addSelectedMember}>Add Member</Button>
-                        <Button color="secondary" onClick={this.closeModal}>Close</Button>
-                    </ModalFooter>
-                </Modal>
+               <ModalPopup 
+                modal={this.state.modal} 
+                toggle={this.toggle}
+                addSelectedMember = {this.addSelectedMember}
+                closeModal = {this.closeModal}
+                >
+                <Grid
+                        data={this.state.data}
+                        tempMember={this.state.tempMember}
+                        colDef={colDef}
+                        currentPage={this.state.currentPage}
+                        countPerPage={this.state.countPerPage}
+                        pagingClick={this.pagingClick}
+                        totalDataCount={this.state.totalDataCount}
+                        nextPage={this.nextPage}
+                        prevPage={this.prevPage}
+                        actionType={this.actionType}
+                        selectUser={this.selectUser}
+                        selectAll={this.selectAll}
+                    />
+               </ModalPopup>
             </Layout>
         )
     }

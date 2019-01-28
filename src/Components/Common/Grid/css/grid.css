@@ -1,0 +1,32 @@
+.pagination button[disabled]{
+    color:#d5d5d5;
+    background: #f1f1f1;
+}
+.table-grid{
+    position: relative;
+    min-height: 200px;
+}
+.table-grid .fa-spinner{
+    position: absolute;
+    left:50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+}
+.table-responsive{
+    border:1px solid #dee2e6;
+    border-radius: 5px;
+    margin-bottom:10px;
+    min-height: 320px;
+}
+.table-responsive table{
+    margin-bottom: 0;
+}
+.table td, .table th{
+    padding:.5rem;
+}
+.table th{
+    background: #eaeaea;
+}
+.options{
+    width:150px;
+}

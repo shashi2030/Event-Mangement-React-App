@@ -1,18 +1,25 @@
-import React from 'react';
+import React, { Component } from 'react';
 import { Button, Modal, ModalHeader, ModalFooter, ModalBody } from 'reactstrap';
-export const ModalPopup = (props) => {
-    return (
-        <Modal isOpen={props.modal} toggle={props.toggle} className="modal-dialog modal-dialog-centered modal-xl">
-            <ModalHeader>Member List</ModalHeader>
-            <ModalBody>
-                {
-                    props.children
-                }               
-            </ModalBody>
-            <ModalFooter>
-                <Button color="primary" onClick={props.addSelectedMember}>Add Member</Button>
-                <Button color="secondary" onClick={props.closeModal}>Close</Button>
-            </ModalFooter>
-        </Modal>
-    )
+
+class ModalPopup extends Component {
+    constructor(props){
+        super(props);
+    }
+    render() {
+        return (
+            <Modal isOpen={this.props.modal} toggle={this.props.toggle} className="modal-dialog modal-dialog-centered modal-xl">
+                <ModalHeader>Member List</ModalHeader>
+                <ModalBody>
+                    {
+                        this.props.children
+                    }
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="primary" onClick={this.props.addSelectedMember}>Add Member</Button>
+                    <Button color="secondary" onClick={this.props.closeModal}>Close</Button>
+                </ModalFooter>
+            </Modal>
+        )
+    }
 }
+export default ModalPopup;

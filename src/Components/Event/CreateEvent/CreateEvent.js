@@ -12,7 +12,7 @@ import Grid from '../../Common/Grid/Grid';
 import { userActions } from '../../../actions/users.actions'
 import BreadCrumb from '../../Common/Breadcrumb/Breadcrumb';
 import { AlertBox } from '../../Common/AlertBox/AlertBox';
-import {ModalPopup} from '../../Common/ModalPopup/ModalPopup';
+import ModalPopup from '../../Common/ModalPopup/ModalPopup';
 require('./css/createevent.css');
 /**
  * Define Constant of Table column Definition
@@ -313,6 +313,20 @@ class CreateEvent extends Component {
         }
     }
 
+    deleteMember=(index,id)=>{
+        let members = [...this.state.members];
+        members.splice(index,1);
+        let tempMemberData = [...this.state.tempMember];
+        let findIndex = tempMemberData.findIndex((val)=>{
+            return val.id === id
+        });
+        tempMemberData.splice(findIndex,1);
+        this.setState({
+            members:members,
+            tempMember:tempMemberData
+        })
+    }
+
     /**
      * render to html
      * @param {null}
@@ -378,7 +392,7 @@ class CreateEvent extends Component {
                                         <ul className="member-list">
                                             {
                                                 this.state.members && this.state.members.map((value,index)=>{
-                                                    return <li key={index}>{value.username} <i className="fa fa-times" aria-hidden="true"></i></li>
+                                                    return <li key={index}>{value.username} <i className="fa fa-times" aria-hidden="true" onClick={()=>this.deleteMember(index,value.id)}></i></li>
                                                 })
                                             }
                                         </ul>

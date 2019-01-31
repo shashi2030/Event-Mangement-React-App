@@ -17,6 +17,7 @@ import { AlertBox } from '../../Common/AlertBox/AlertBox';
  */
 const colDef = {
     "id": { "label": "ID", 'sort': false, "display": true },
+    "vendortype": { "label": "Vendor Type", 'sort': true, "display": true },
     "name": { "label": "Vendor Name", 'sort': true, "display": true },
     "contact": { "label": "Contact No.", 'sort': true, "display": true },
     "email": { "label": "Email", 'sort': true, "display": true },

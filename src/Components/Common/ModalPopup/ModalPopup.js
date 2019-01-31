@@ -5,19 +5,32 @@ class ModalPopup extends Component {
     constructor(props){
         super(props);
     }
+    footerRender = () =>{
+        let data = '';
+        switch(this.props.popupType){
+            case 'member':
+            data = (<ModalFooter><Button color="primary" onClick={this.props.addSelectedMember}>Add Member</Button>
+            <Button color="secondary" onClick={this.props.closeModal}>Close</Button> </ModalFooter>)
+            break;
+            case 'vendor':
+            data = (<ModalFooter>
+                <Button color="primary" onClick={this.props.addSelectedVendor}>Add Vendor</Button>
+                <Button color="secondary" onClick={this.props.closeModal}>Close</Button>
+            </ModalFooter>)
+            break;
+        }
+        return data;
+    }
     render() {
         return (
             <Modal isOpen={this.props.modal} toggle={this.props.toggle} className="modal-dialog modal-dialog-centered modal-xl">
-                <ModalHeader>Member List</ModalHeader>
+                <ModalHeader>{this.props.heading}</ModalHeader>
                 <ModalBody>
                     {
                         this.props.children
                     }
                 </ModalBody>
-                <ModalFooter>
-                    <Button color="primary" onClick={this.props.addSelectedMember}>Add Member</Button>
-                    <Button color="secondary" onClick={this.props.closeModal}>Close</Button>
-                </ModalFooter>
+               {this.footerRender()}
             </Modal>
         )
     }

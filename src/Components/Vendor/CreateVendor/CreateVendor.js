@@ -15,6 +15,7 @@ import { AlertBox } from '../../Common/AlertBox/AlertBox';
  * Define constant for the Vendor Form
  */
 const vendorform = {
+    vendortype:"",
     name: "",
     contact: "",
     email: "",
@@ -69,12 +70,13 @@ class CreateVendor extends Component {
         this.setState({
             submitted: true
         })
-        let { name, contact, email, description } = this.state;
+        let { name, contact, email, description, vendortype } = this.state;
         let vendordata = {
+            vendortype:vendortype,
             name: name,
             contact: contact,
             email: email,
-            description:description
+            description:description            
         };
         if (name && contact) {
             vendorActions.createVendor(vendordata).then(response => {
@@ -109,7 +111,7 @@ class CreateVendor extends Component {
      * @return {null}
      */
     handleback = () => {
-        this.props.history.push('/listusers');
+        this.props.history.push('/listvendor');
     }
 
     /**
@@ -118,7 +120,7 @@ class CreateVendor extends Component {
      * @return {Object}
      */
     render() { 
-        const { name, contact, email, description, submitted, errormessage } = this.state;
+        const { name, contact, email, description, submitted, errormessage, vendortype } = this.state;
         const breadcrumbdata = [
             {
                 "id": "home",
@@ -143,7 +145,7 @@ class CreateVendor extends Component {
         ]
         const creatButtonActive = () => {
             let isActive = false;
-            if (!name && !contact && !email && !description) {
+            if (!name && !contact && !email && !description && !vendortype) {
                 isActive = true;
             }
             return isActive;
@@ -156,6 +158,19 @@ class CreateVendor extends Component {
                 <Row>
                     <Col sm="12" md={{ size: 8, offset: 2 }}>
                         <Form onSubmit={this.handleSubmit}>
+                            <FormGroup row>
+                                <Label for="name" sm={3}>Vendor Type</Label>
+                                <Col sm={9}>
+                                    <Input type="select" name="vendortype" invalid={submitted && !vendortype} value={vendortype} onChange={this.handleChange} id="vendortype">
+                                        <option defaultValue>Select</option>
+                                        <option>type 1</option>
+                                        <option>type 2</option>
+                                        <option>type 3</option>
+                                        <option>type 4</option>
+                                    </Input>
+                                    {submitted && !vendortype && <FormFeedback>Select Vendor Type</FormFeedback>}
+                                </Col>
+                            </FormGroup>
                             <FormGroup row>
                                 <Label for="name" sm={3}>Vendor Name</Label>
                                 <Col sm={9}>

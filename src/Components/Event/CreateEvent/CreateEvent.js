@@ -5,11 +5,12 @@
  * @author Shashi Kapoor Singh
  */
 import React, { Component } from 'react';
-import { Row, Col, Button, Form, FormGroup, Label, Input, FormFeedback} from 'reactstrap';
+import { Row, Col, Button, Form, FormGroup, Label, Input, FormFeedback } from 'reactstrap';
 import { Layout } from '../../Common/Layout/Layout';
 import { eventActions } from '../../../actions/event.actions';
 import Grid from '../../Common/Grid/Grid';
-import { userActions } from '../../../actions/users.actions'
+import { userActions } from '../../../actions/users.actions';
+import { vendorActions } from '../../../actions/vendor.actions';
 import BreadCrumb from '../../Common/Breadcrumb/Breadcrumb';
 import { AlertBox } from '../../Common/AlertBox/AlertBox';
 import ModalPopup from '../../Common/ModalPopup/ModalPopup';
@@ -18,7 +19,7 @@ require('./css/createevent.css');
  * Define Constant of Table column Definition
  */
 const colDef = {
-    "select": { "label": "Select", "checked":false, 'sort': false, "display": true },
+    "select": { "label": "Select", "checked": false, 'sort': false, "display": true },
     "id": { "label": "ID", 'sort': false, "display": true },
     "username": { "label": "User Name", 'sort': true, "display": true },
     "buildingname": { "label": "Building Name", 'sort': true, "display": true },
@@ -49,10 +50,23 @@ const eventform = {
     currentPage: 1,
     countPerPage: 5,
     totalDataCount: 0,
-    addedMember:[],
-    tempMember:[]
+    addedMember: [],
+    tempMember: [],
+    vendorData:{},
+    SelectedVendor:{}
 }
 
+const popupDescription = {
+    member: {
+        heading: "Member List"
+    },
+    vendor: {
+        heading: "Vendor List"
+    },
+    items: {
+        heading: "Items"
+    }
+}
 /**
  * @name CreateEvent
  * @extends React.Component
@@ -146,19 +160,39 @@ class CreateEvent extends Component {
         this.props.history.push('/listevent');
     }
 
-    addMember = (type) => {
-        switch(type){
+    setPopupType = (type) => {
+        switch (type) {
             case 'member':
                 this.setState({
-                    modal: true
-                }); 
-                this.userAPICall();  
-            break;
+                    modal: true,
+                    popupHeading: popupDescription.member.heading
+                });
+                this.userAPICall();
+                break;
             case 'vendor':
-
-            break;
+                this.setState({
+                    modal: true,
+                    popupHeading: popupDescription.vendor.heading
+                });
+                this.vendorAPICall();
+                break;
         }
-             
+    }
+    addMember = (type) => {
+        this.setState({
+            popupType: type
+        }, () => {
+            this.setPopupType(this.state.popupType);
+        })
+    }
+
+    addVendor = () => {
+        let type = 'vendor';
+        this.setState({
+            popupType: type
+        }, () => {
+            this.setPopupType(this.state.popupType);
+        })
     }
 
     /**
@@ -190,16 +224,26 @@ class CreateEvent extends Component {
      * @return {null}
      */
     vendorAPICall = () => {
-        let data = {
-            pageNo: this.state.currentPage,
-            pageLimit: this.state.countPerPage
-        }
-        userActions
-            .listUser(data)
+        let data = {}
+        vendorActions
+            .listVendor(data)
             .then(response => {
+                let vendorData = {}
+                let SelectedVendor = {...this.state.SelectedVendor};
+                for (let i = 0; i < response.data.length; i++) {
+                    if (vendorData[response.data[i].vendortype]) {
+                        vendorData[response.data[i].vendortype].push(response.data[i]);
+                    } else {
+                        vendorData[response.data[i].vendortype] = [response.data[i]]
+                    }
+                    if(!SelectedVendor[response.data[i].vendortype]){
+                        SelectedVendor[response.data[i].vendortype]={"selectedValue":-1}
+                    }                    
+                }
                 this.setState({
-                    data: response.data,
-                    totalDataCount: response.headers["x-total-count"]
+                    vendorData: vendorData,
+                    SelectedVendor:SelectedVendor,
+                    tempSelectedVendor:SelectedVendor
                 })
             })
             .catch(error => {
@@ -257,53 +301,53 @@ class CreateEvent extends Component {
         })
     }
 
-    selectUser = (e,id,name) =>{
-        var selectMember = [...this.state.tempMember];       
-        if(!e.target.checked){
-            var checkedIndex = selectMember.findIndex(val => val.id==id);
-            selectMember.splice(checkedIndex,1);
+    selectUser = (e, id, name) => {
+        var selectMember = [...this.state.tempMember];
+        if (!e.target.checked) {
+            var checkedIndex = selectMember.findIndex(val => val.id == id);
+            selectMember.splice(checkedIndex, 1);
             this.setState({
                 tempMember: selectMember
             })
-        }else{
-            selectMember.push({"id":id,"username":name});
+        } else {
+            selectMember.push({ "id": id, "username": name });
             this.setState({
                 tempMember: selectMember
             })
-        }  
+        }
     }
 
-    addSelectedMember = () =>{
+    addSelectedMember = () => {
         this.setState({
-            members:this.state.tempMember,
+            members: this.state.tempMember,
             modal: !this.state.modal
         })
     }
 
-    findData = (arr,key) =>{
-        return arr.findIndex(val=>{
+    findData = (arr, key) => {
+        return arr.findIndex(val => {
             return val.id === key
         })
     }
 
-    selectAll = (e) =>{
+    selectAll = (e) => {
         let allUser = [...this.state.data];
-        let tempMemberData = [...this.state.tempMember];        
-        if(e.target.checked){            
-            allUser.filter((value,index)=>{
-               if(this.findData(tempMemberData,value.id) === -1){
-                tempMemberData.push({"id":value.id,"username":value.username});
-               }               
+        let tempMemberData = [...this.state.tempMember];
+        if (e.target.checked) {
+            allUser.filter((value, index) => {
+                if (this.findData(tempMemberData, value.id) === -1) {
+                    tempMemberData.push({ "id": value.id, "username": value.username });
+                }
             })
             this.setState({
                 ...this.state,
                 tempMember: tempMemberData
             })
-        }else{
-            allUser.filter((value,index)=>{
-                tempMemberData.filter((val,ind)=>{
-                    if(value.id === val.id){
-                        tempMemberData.splice(ind,1)
+        } else {
+            allUser.filter((value, index) => {
+                tempMemberData.filter((val, ind) => {
+                    if (value.id === val.id) {
+                        tempMemberData.splice(ind, 1)
                     }
                 })
             })
@@ -313,18 +357,95 @@ class CreateEvent extends Component {
         }
     }
 
-    deleteMember=(index,id)=>{
+    deleteMember = (index, id) => {
         let members = [...this.state.members];
-        members.splice(index,1);
+        members.splice(index, 1);
         let tempMemberData = [...this.state.tempMember];
-        let findIndex = tempMemberData.findIndex((val)=>{
+        let findIndex = tempMemberData.findIndex((val) => {
             return val.id === id
         });
-        tempMemberData.splice(findIndex,1);
+        tempMemberData.splice(findIndex, 1);
         this.setState({
-            members:members,
-            tempMember:tempMemberData
+            members: members,
+            tempMember: tempMemberData
         })
+    }
+
+    deleteVendor = (name) =>{
+        let updatedVendor = {...this.state.SelectedVendor} ;
+        updatedVendor[name] = {"selectedValue": -1, "selected": false};
+       this.setState({
+        SelectedVendor:updatedVendor
+       })
+    }
+
+    handleChangeVendor = (type,e) =>{
+        let data = {...this.state.tempSelectedVendor}
+            data[type] = {"selectedValue":e.target.selectedIndex-1,"selected":true}
+        this.setState({
+            ...this.state,
+            tempSelectedVendor:data
+        })
+    }
+    addSelectedVendor =()=>{
+        if(this.state.tempSelectedVendor !== undefined || this.state.tempSelectedVendor !==null){
+            this.setState({
+                ...this.state,
+                SelectedVendor:this.state.tempSelectedVendor,
+                modal: !this.state.modal
+            })
+        }        
+    }
+
+    renderPopupData = () => {
+        let renderData = "";
+        switch (this.state.popupType) {
+            case 'member':
+                renderData = <Grid
+                    data={this.state.data}
+                    tempMember={this.state.tempMember}
+                    colDef={colDef}
+                    currentPage={this.state.currentPage}
+                    countPerPage={this.state.countPerPage}
+                    pagingClick={this.pagingClick}
+                    totalDataCount={this.state.totalDataCount}
+                    nextPage={this.nextPage}
+                    prevPage={this.prevPage}
+                    actionType={this.actionType}
+                    selectUser={this.selectUser}
+                    selectAll={this.selectAll}
+                />
+                break;
+            case 'vendor':
+                renderData = (
+                    <div>
+                        {this.state.vendorData && Object.keys(this.state.vendorData).map((value, index) => {
+                            return (<Row key={index}>
+                                <Col sm="12" md={{ size: 8, offset: 2 }}>
+                                    <FormGroup row>
+                                        <Label for={value} sm={3}>{value}</Label>
+                                        <Col sm={9}>
+                                            <Input type="select" name={value} onChange={(e)=>this.handleChangeVendor(value,e)} id={value}>              
+                                            <option>None</option>                                      
+                                                {
+                                                    this.state.vendorData[value].map((val, ind) => {
+                                                        return <option key={ind} ids={val.id} selected={this.state.SelectedVendor!= null ?this.state.SelectedVendor[value].selectedValue == ind ? true : null : null} >{val.name}</option>
+                                                    })
+
+                                                }
+                                            </Input>
+                                        </Col>
+                                    </FormGroup>
+                                </Col>
+                            </Row>)
+                        })
+
+                        }
+                    </div>
+                )
+                break;
+        }
+        return renderData;
     }
 
     /**
@@ -388,20 +509,37 @@ class CreateEvent extends Component {
                             <FormGroup row>
                                 <Label for="members" sm={3}>Members</Label>
                                 <Col sm={9}>
-                                    <button type="button" onClick={()=>this.addMember('member')}><i className="fa fa-user-plus" aria-hidden="true"></i></button>                                    
-                                        <ul className="member-list">
-                                            {
-                                                this.state.members && this.state.members.map((value,index)=>{
-                                                    return <li key={index}>{value.username} <i className="fa fa-times" aria-hidden="true" onClick={()=>this.deleteMember(index,value.id)}></i></li>
-                                                })
-                                            }
-                                        </ul>
+                                    <button type="button" onClick={() => this.addMember('member')}><i className="fa fa-user-plus" aria-hidden="true"></i></button>
+                                    {
+                                        members.length ?
+                                            <ul className="member-list">
+                                                {
+                                                    members && members.map((value, index) => {
+                                                        return <li key={index}>{value.username} <i className="fa fa-times" aria-hidden="true" onClick={() => this.deleteMember(index, value.id)}></i></li>
+                                                    })
+                                                }
+                                            </ul> : null
+                                    }
+
                                 </Col>
                             </FormGroup>
                             <FormGroup row>
                                 <Label for="vendors" sm={3}>Select Vendor</Label>
                                 <Col sm={9}>
-                                    11
+                                    <button type="button" onClick={this.addVendor}><i className="fa fa-user-plus" aria-hidden="true"></i></button>
+                                    
+                                    {                                        
+                                         this.state.SelectedVendor && Object.keys(this.state.SelectedVendor).length !== 0 ?
+                                         <ul className="member-list vendorlist">
+                                                {
+                                                    this.state.SelectedVendor && Object.keys(this.state.SelectedVendor).map((value, index) => {
+                                                        if(this.state.SelectedVendor[value].selected){
+                                                            return <li key={index}> <label>{value} : </label> <span>{this.state.vendorData[value][this.state.SelectedVendor[value].selectedValue].name}</span> <i className="fa fa-times" aria-hidden="true" onClick={() => this.deleteVendor(value)} ></i></li>
+                                                        }                                                       
+                                                    })
+                                                }
+                                            </ul> : null
+                                    }
                                 </Col>
                             </FormGroup>
                             <FormGroup row>
@@ -440,27 +578,17 @@ class CreateEvent extends Component {
                     </Col>
                 </Row>
 
-               <ModalPopup 
-                modal={this.state.modal} 
-                toggle={this.toggle}
-                addSelectedMember = {this.addSelectedMember}
-                closeModal = {this.closeModal}
+                <ModalPopup
+                    modal={this.state.modal}
+                    toggle={this.toggle}
+                    addSelectedMember={this.addSelectedMember}
+                    addSelectedVendor={this.addSelectedVendor}
+                    closeModal={this.closeModal}
+                    heading={this.state.popupHeading}
+                    popupType={this.state.popupType}
                 >
-                <Grid
-                        data={this.state.data}
-                        tempMember={this.state.tempMember}
-                        colDef={colDef}
-                        currentPage={this.state.currentPage}
-                        countPerPage={this.state.countPerPage}
-                        pagingClick={this.pagingClick}
-                        totalDataCount={this.state.totalDataCount}
-                        nextPage={this.nextPage}
-                        prevPage={this.prevPage}
-                        actionType={this.actionType}
-                        selectUser={this.selectUser}
-                        selectAll={this.selectAll}
-                    />
-               </ModalPopup>
+                    {this.renderPopupData()}
+                </ModalPopup>
             </Layout>
         )
     }

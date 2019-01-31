@@ -1,6 +1,8 @@
 .member-list{
     margin: 0;
     padding: 5px 0 0 0;
+    max-height:205px;
+    overflow: auto;
 }
 .member-list li{
     border:solid 1px gray;
@@ -22,4 +24,11 @@
     right: 8px;
     top: 8px;
     cursor:pointer;
+}
+.vendorlist li{
+    width:90%;
+}
+.vendorlist li label{
+    font-weight: 600;
+    margin-bottom: 0;
 }

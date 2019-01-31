@@ -165,6 +165,7 @@
   ],
   "vendors": [
     {
+      "vendortype": "Catering",
       "name": "Sohan Kumar1",
       "contact": "54545454",
       "email": "sdf@gmail.com",
@@ -172,6 +173,7 @@
       "id": 1
     },
     {
+      "vendortype": "Catering",
       "name": "sdfsdf",
       "contact": "34234234",
       "email": "ajay2@gmail.com2",
@@ -179,6 +181,7 @@
       "id": 2
     },
     {
+      "vendortype": "Catering",
       "name": "vendor 1",
       "contact": "9868458647",
       "email": "vendor1@gmail.com",
@@ -186,6 +189,7 @@
       "id": 3
     },
     {
+      "vendortype": "type2",
       "name": "Vendor 5",
       "contact": "9696969696",
       "email": "vendor@gmail.com",
@@ -193,6 +197,7 @@
       "id": 4
     },
     {
+      "vendortype": "DJ",
       "name": "Vendor 99",
       "contact": "9898665656454",
       "email": "vendor99@gmail.com",
@@ -200,6 +205,7 @@
       "id": 5
     },
     {
+      "vendortype": "type3",
       "name": "Vendor 787--",
       "contact": "98989898989800",
       "email": "vendor78700@gmail.com",
@@ -207,11 +213,44 @@
       "id": 6
     },
     {
+      "vendortype": "type4",
       "name": "sdfsdfsdf",
       "contact": "34234543",
       "email": "peter0985@gmail.com",
       "description": "zdsdfsdf",
       "id": 7
+    },
+    {
+      "vendortype": "DJ",
+      "name": "Test 1 Dec",
+      "contact": "8787878787",
+      "email": "dad@gmail.com",
+      "description": " stjlsd jsdl fjsdl fjlskd fjsdfsdf",
+      "id": 8
+    },
+    {
+      "vendortype": "type4",
+      "name": "DK 121",
+      "contact": "874545454544",
+      "email": "111@gmail.com",
+      "description": "skldjf lksdj fkljsdf",
+      "id": 9
+    },
+    {
+      "vendortype": "DJ",
+      "name": "sdfsf sdf sd",
+      "contact": "234234234",
+      "email": "sdfsdfsdfsdfsdfsdfsdfsdf",
+      "description": "sdfsdf",
+      "id": 10
+    },
+    {
+      "vendortype": "type3",
+      "name": "2342423",
+      "contact": "234242",
+      "email": "peter0985@gmail.com",
+      "description": "rr",
+      "id": 11
     }
   ],
   "comments": [

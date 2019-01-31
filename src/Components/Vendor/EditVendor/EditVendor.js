@@ -16,6 +16,7 @@ import { AlertBox } from '../../Common/AlertBox/AlertBox';
  */
 const vendorform = {
     id: null,
+    vendortype:"",
     name: "",
     contact: "",
     email: "",
@@ -110,8 +111,9 @@ class EditVendor extends Component {
         this.setState({
             submitted: true
         })
-        let { id, name, contact, email, description } = this.state;
+        let { id, vendortype, name, contact, email, description } = this.state;
         let vendordata = {
+            vendortype:vendortype,
             name: name,
             contact: contact,
             email:email,
@@ -160,7 +162,7 @@ class EditVendor extends Component {
      * @return {Object}
      */
     render() {
-        const { id, name, contact, email, description, submitted, errormessage } = this.state;
+        const { id, vendortype, name, contact, email, description, submitted, errormessage } = this.state;
         const breadcrumbdata = [
             {
                 "id": "home",
@@ -195,6 +197,19 @@ class EditVendor extends Component {
                                 <Label for="id" sm={3}>Vendor Id</Label>
                                 <Col sm={9}>
                                     <p>{id}</p>
+                                </Col>
+                            </FormGroup>
+                            <FormGroup row>
+                                <Label for="name" sm={3}>Vendor Name</Label>
+                                <Col sm={9}>
+                                    <Input type="select" name="vendortype" invalid={submitted && !vendortype} value={vendortype} onChange={this.handleChange} id="vendortype">
+                                        <option defaultValue>Select</option>
+                                        <option>Cater</option>
+                                        <option>DJ</option>
+                                        <option>Decoration</option>
+                                        <option>Sweets</option>
+                                    </Input>
+                                    {submitted && !vendortype && <FormFeedback>Select Vendor Type</FormFeedback>}
                                 </Col>
                             </FormGroup>
                             <FormGroup row>

@@ -35,9 +35,19 @@ class TopNav extends Component {
                 <NavbarToggler onClick={this.toggle} />
                 <Collapse isOpen={this.state.isOpen} navbar>
                     <Nav className="ml-auto" navbar>
-                        <NavItem>
-                            <NavLink href="/components/">Components</NavLink>
-                        </NavItem>
+                    <UncontrolledDropdown nav inNavbar>
+                            <DropdownToggle nav caret>
+                                Item
+                            </DropdownToggle>
+                            <DropdownMenu right>
+                                <DropdownItem>
+                                    <Link to={'/listitem'}>Item List</Link>
+                                </DropdownItem>
+                                <DropdownItem>
+                                    <Link to={'/createitem'}>Create Item</Link>
+                                </DropdownItem>                               
+                            </DropdownMenu>
+                        </UncontrolledDropdown>
                         <UncontrolledDropdown nav inNavbar>
                             <DropdownToggle nav caret>
                                 Event

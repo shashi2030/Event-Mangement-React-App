@@ -8,3 +8,6 @@ h1{
 .breadcrumb{
     margin:10px 0;
 }
+.custom-error{
+    display: block;
+}

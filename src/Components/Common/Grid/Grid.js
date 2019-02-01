@@ -106,28 +106,7 @@ class Grid extends Component {
                             </tr>
                         </thead>
                         <tbody>
-                            {this.props.data ? this.props.data.map((value, index) => {
-                                return <tr key={index}>
-                                    {this.props.colDef && Object.keys(this.props.colDef).map((val, ind) => {                                        
-                                         if (val === 'select') {
-                                             return <td key={ind}><input type="checkbox" checked={this.findSelectedId(value.id)} id={value.id} onChange={(e)=>this.props.selectUser(e,value.id,value.username)} /></td>
-                                         }
-                                        if (val === 'options') {
-                                            return <td key={ind}><ButtonGroup>
-                                                {this.props.colDef["options"].list.map((v, i) => {
-                                                    return <Button key={i} outline color="info" onClick={() => this.props.actionType(value.id, v.action, index)} >
-                                                        {this.renderActionButton(v)}
-                                                    </Button>
-                                                })}
-                                            </ButtonGroup></td>
-                                        } else {
-                                            return <td key={ind}>{value[val]}</td>
-                                        }
-                                    })
-                                    }
-                                </tr>
-                            }) : null
-                            }
+                           
                         </tbody>
                     </Table>
                 </div>

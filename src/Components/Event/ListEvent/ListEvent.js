@@ -240,6 +240,12 @@ class ListEvent extends Component {
         this.props.history.push('/createevent');
     }
 
+    popupAction =(id,type) =>{
+        console.log(id);
+        console.log(type);
+    }
+
+
     /**
      * render to html
      * @param {null}
@@ -280,6 +286,7 @@ class ListEvent extends Component {
                         nextPage={this.nextPage}
                         prevPage={this.prevPage}
                         actionType={this.actionType}
+                        popupAction = {this.popupAction}
                     />
                 </div>
                 <Modal isOpen={this.state.modal} toggle={this.toggle} className="modal-dialog modal-dialog-centered">

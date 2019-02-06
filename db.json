@@ -165,92 +165,105 @@
   ],
   "vendors": [
     {
-      "vendortype": "Catering",
+      "vendortype": "type 1",
       "name": "Sohan Kumar1",
       "contact": "54545454",
       "email": "sdf@gmail.com",
+      "items": [
+        {
+          "id": 3
+        },
+        {
+          "id": 4
+        },
+        {
+          "id": 5
+        }
+      ],
       "description": "test",
       "id": 1
     },
     {
-      "vendortype": "Catering",
-      "name": "sdfsdf",
-      "contact": "34234234",
-      "email": "ajay2@gmail.com2",
-      "description": "sdfsdf",
+      "vendortype": "type 1",
+      "name": "21 vendor",
+      "contact": "84878787845454",
+      "email": "sdd@gmail.com",
+      "items": [
+        {
+          "id": 1
+        },
+        {
+          "id": 2
+        },
+        {
+          "id": 6
+        }
+      ],
+      "description": "This is dummy description",
       "id": 2
     },
     {
-      "vendortype": "Catering",
-      "name": "vendor 1",
-      "contact": "9868458647",
-      "email": "vendor1@gmail.com",
-      "description": "test vendor description",
+      "vendortype": "type 4",
+      "name": "Vendor Name 1",
+      "contact": "99898989898",
+      "email": "test@gmail.com",
+      "items": [
+        {
+          "id": 2
+        },
+        {
+          "id": 3
+        },
+        {
+          "id": 6
+        }
+      ],
+      "description": "This is test",
       "id": 3
     },
     {
-      "vendortype": "type2",
-      "name": "Vendor 5",
-      "contact": "9696969696",
-      "email": "vendor@gmail.com",
-      "description": "dsdfsdfsdfsdf",
+      "vendortype": "type 4",
+      "name": "AVD Vendor",
+      "contact": "989898989898",
+      "email": "ddd@dd.com",
+      "items": [
+        {
+          "id": 2
+        },
+        {
+          "id": 3
+        },
+        {
+          "id": 4
+        }
+      ],
+      "description": "Test description",
       "id": 4
     },
     {
-      "vendortype": "DJ",
-      "name": "Vendor 99",
-      "contact": "9898665656454",
-      "email": "vendor99@gmail.com",
-      "description": " vendor 99 text me8888",
+      "vendortype": "type 3",
+      "name": "vendor 3 name",
+      "contact": "9898989898",
+      "email": "vendor3@gmail.com",
+      "items": [
+        {
+          "id": 2
+        },
+        {
+          "id": 6
+        },
+        {
+          "id": 1
+        },
+        {
+          "id": 3
+        },
+        {
+          "id": 4
+        }
+      ],
+      "description": "desc",
       "id": 5
-    },
-    {
-      "vendortype": "type3",
-      "name": "Vendor 787--",
-      "contact": "98989898989800",
-      "email": "vendor78700@gmail.com",
-      "description": "vendor descriptions-9-9-9q",
-      "id": 6
-    },
-    {
-      "vendortype": "type4",
-      "name": "sdfsdfsdf",
-      "contact": "34234543",
-      "email": "peter0985@gmail.com",
-      "description": "zdsdfsdf",
-      "id": 7
-    },
-    {
-      "vendortype": "DJ",
-      "name": "Test 1 Dec",
-      "contact": "8787878787",
-      "email": "dad@gmail.com",
-      "description": " stjlsd jsdl fjsdl fjlskd fjsdfsdf",
-      "id": 8
-    },
-    {
-      "vendortype": "type4",
-      "name": "DK 121",
-      "contact": "874545454544",
-      "email": "111@gmail.com",
-      "description": "skldjf lksdj fkljsdf",
-      "id": 9
-    },
-    {
-      "vendortype": "DJ",
-      "name": "sdfsf sdf sd",
-      "contact": "234234234",
-      "email": "sdfsdfsdfsdfsdfsdfsdfsdf",
-      "description": "sdfsdf",
-      "id": 10
-    },
-    {
-      "vendortype": "type3",
-      "name": "2342423",
-      "contact": "234242",
-      "email": "peter0985@gmail.com",
-      "description": "rr",
-      "id": 11
     }
   ],
   "items": [
@@ -314,103 +327,156 @@
       "description": "ddd"
     },
     {
-      "name": "SDFSDF",
-      "date": "2019-02-13",
+      "name": "1st jan party",
+      "date": "2019-02-01",
       "members": [
         {
-          "id": 3,
-          "username": "Sohan"
+          "id": 11
         },
         {
-          "id": 4,
-          "username": "Ramesh Kumarq"
+          "id": 12
+        },
+        {
+          "id": 13
+        },
+        {
+          "id": 14
+        },
+        {
+          "id": 15
         }
       ],
       "vendor": {
-        "DJ": {
-          "selectedValue": 0,
-          "name": "Vendor 99",
-          "id": "5"
+        "type 1": {
+          "id": "1",
+          "items": [
+            {
+              "id": 4
+            }
+          ]
+        },
+        "type 4": {
+          "id": "3",
+          "items": [
+            {
+              "id": 6
+            }
+          ]
+        },
+        "type 3": {
+          "id": "5",
+          "items": [
+            {
+              "id": 3
+            },
+            {
+              "id": 4
+            }
+          ]
         }
       },
-      "items": [
-        {
-          "name": "Rice",
-          "id": "1"
-        }
-      ],
-      "totalprice": "333",
-      "totalcollection": "333",
-      "description": "3333",
+      "items": [],
+      "totalprice": "9999",
+      "totalcollection": "9999",
+      "description": "9999",
       "id": 2
     },
     {
-      "name": "efwrsdfsdf",
-      "date": "2019-02-14",
+      "name": "25th movement ",
+      "date": "2019-02-27",
       "members": [
         {
-          "id": 16,
-          "username": "3333"
+          "id": 1
         },
         {
-          "id": 17,
-          "username": "3333"
+          "id": 2
         },
         {
-          "id": 18,
-          "username": "3333"
+          "id": 3
         },
         {
-          "id": 19,
-          "username": "3333"
+          "id": 4
         },
         {
-          "id": 20,
-          "username": "3333"
-        },
-        {
-          "id": 11,
-          "username": "shashi"
-        },
-        {
-          "id": 12,
-          "username": "shashi"
-        },
-        {
-          "id": 13,
-          "username": "ss"
+          "id": 5
         }
       ],
       "vendor": {
         "DJ": {
-          "selectedValue": 1,
-          "name": "Test 1 Dec",
-          "id": "8"
-        },
-        "type3": {
-          "selectedValue": 0,
-          "name": "Vendor 787--",
-          "id": "6"
+          "id": "3",
+          "items": [
+            {
+              "id": 2
+            },
+            {
+              "id": 3
+            },
+            {
+              "id": 6
+            }
+          ]
         }
       },
-      "items": [
+      "items": [],
+      "totalprice": "5545454",
+      "totalcollection": "45454545454",
+      "description": "54545454",
+      "id": 4
+    },
+    {
+      "name": "5th function",
+      "date": "2019-02-15",
+      "members": [
         {
-          "name": "Rice",
-          "id": "1"
+          "id": 16
         },
         {
-          "name": "Rice 1",
-          "id": "2"
+          "id": 17
         },
         {
-          "name": "Item 2",
-          "id": "3"
+          "id": 18
+        },
+        {
+          "id": 19
+        },
+        {
+          "id": 20
         }
       ],
-      "totalprice": "444",
-      "totalcollection": "44444",
-      "description": "44444",
-      "id": 3
+      "vendor": {
+        "type 1": {
+          "id": "1",
+          "items": [
+            {
+              "id": 4
+            }
+          ]
+        },
+        "type 4": {
+          "id": "3",
+          "items": [
+            {
+              "id": 2
+            }
+          ]
+        },
+        "type 3": {
+          "id": "5",
+          "items": [
+            {
+              "id": 2
+            },
+            {
+              "id": 6
+            }
+          ]
+        }
+      },
+      "items": [],
+      "totalprice": "545445",
+      "totalcollection": "5454545454",
+      "description": "5454",
+      "id": 5
     }
   ],
   "comments": [

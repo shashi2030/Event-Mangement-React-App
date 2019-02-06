@@ -9,7 +9,7 @@ import { Row, Col, Button, Form, FormGroup, Label } from 'reactstrap';
 import { Layout } from '../../Common/Layout/Layout';
 import { vendorActions } from '../../../actions/vendor.actions';
 import BreadCrumb from '../../Common/Breadcrumb/Breadcrumb';
-
+require('./css/viewvendor.css');
 /**
  * Define constant for the View User
  */
@@ -88,7 +88,7 @@ class ViewVendor extends Component {
      * @return {Object}
      */
     render() {        
-        const { id, name, contact, email, description} = this.state;
+        const { id, name, contact, email,items, description} = this.state;
         const breadcrumbdata = [
             {
                 "id": "home",
@@ -140,6 +140,16 @@ class ViewVendor extends Component {
                                 <Label for="email" sm={3}>Email</Label>
                                 <Col sm={9}>
                                     <p>{email}</p>
+                                </Col>
+                            </FormGroup>
+                            <FormGroup row>
+                                <Label for="items" sm={3}>Items</Label>
+                                <Col sm={9}>
+                                    {
+                                       items && items.map((item,index)=>{
+                                           return <span key={index} className="item">{item} { ' '}</span>
+                                       })
+                                    }
                                 </Col>
                             </FormGroup>
                             <FormGroup row>

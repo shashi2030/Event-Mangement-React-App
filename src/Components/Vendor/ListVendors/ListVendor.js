@@ -5,10 +5,11 @@
  * @author Shashi Kapoor Singh
  */
 import React, { Component } from 'react';
-import { Button, Modal, ModalHeader, ModalFooter } from 'reactstrap';
+import { Button, Modal, ModalHeader, ModalFooter, ModalBody } from 'reactstrap';
 import { Layout } from '../../Common/Layout/Layout';
 import Grid from '../../Common/Grid/Grid';
 import { vendorActions } from '../../../actions/vendor.actions';
+import { itemActions } from '../../../actions/item.actions';
 import BreadCrumb from '../../Common/Breadcrumb/Breadcrumb';
 import { AlertBox } from '../../Common/AlertBox/AlertBox';
 
@@ -21,9 +22,10 @@ const colDef = {
     "name": { "label": "Vendor Name", 'sort': true, "display": true },
     "contact": { "label": "Contact No.", 'sort': true, "display": true },
     "email": { "label": "Email", 'sort': true, "display": true },
+    "items": { "label": "Items", 'sort': true, "display": true },
     "description": { "label": "Description", 'sort': true, "display": true },
     "options": {
-        "label": "Options","class":"options", "sort": true, "display": true, "list": [
+        "label": "Options", "class": "options", "sort": true, "display": true, "list": [
             { "action": "view", "label": "View" },
             { "action": "edit", "label": "Edit" },
             { "action": "delete", "label": "Delete" }
@@ -52,7 +54,8 @@ class ListVendor extends Component {
             modal: false,
             confirmDeleteId: null,
             alertMessage: "",
-            alertVisible: false
+            alertVisible: false,
+            viewItems: false
         }
     }
     /**
@@ -62,6 +65,7 @@ class ListVendor extends Component {
      */
     componentDidMount() {
         this.vendorAPICall();
+        this.itemAPICall();
     }
 
     /**
@@ -238,6 +242,47 @@ class ListVendor extends Component {
     }
 
     /**
+     * Description: Go to the Create Vendor Page
+     * @param {null}
+     * @return {null}
+     */
+    popupAction = (id, val) => {
+        let newData = this.state.data.filter((item) => {
+            return item.id === id;
+        });
+        
+        this.setState({
+            itemPopupData: newData[0].items
+        }, () => {
+            this.toggleItemPopup()
+        })
+    }
+
+    toggleItemPopup = () => {
+        this.setState({
+            viewItems: !this.state.viewItems
+        })
+    }
+
+    /**
+     * Description: itemAPICall function to fetch all item data based on parameter
+     * @param  {null}
+     * @return {null}
+     */
+    itemAPICall = () => {
+        itemActions
+            .listItem()
+            .then(response => {
+                this.setState({
+                    itemData: response.data
+                })
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    /**
      * render to html
      * @param {null}
      * @return {Object}
@@ -272,6 +317,7 @@ class ListVendor extends Component {
                         colDef={colDef}
                         currentPage={this.state.currentPage}
                         countPerPage={this.state.countPerPage}
+                        popupAction={this.popupAction}
                         pagingClick={this.pagingClick}
                         totalDataCount={this.state.totalDataCount}
                         nextPage={this.nextPage}
@@ -279,11 +325,35 @@ class ListVendor extends Component {
                         actionType={this.actionType}
                     />
                 </div>
+
+                {/* Delete Popup */}
                 <Modal isOpen={this.state.modal} toggle={this.toggle} className="modal-dialog modal-dialog-centered">
                     <ModalHeader toggle={this.toggle}>Do you want to delete</ModalHeader>
                     <ModalFooter className="text-center">
                         <Button color="danger" onClick={this.confirmDelete}>Confirm</Button>{' '}
                         <Button color="secondary" onClick={this.closeModal}>Cancel</Button>
+                    </ModalFooter>
+                </Modal>
+
+
+                {/* Item List Popup */}
+                <Modal isOpen={this.state.viewItems} className="modal-dialog modal-dialog-centered">
+                    <ModalHeader toggle={this.toggle}>Item List</ModalHeader>
+                    <ModalBody>
+                        
+                        {
+                            
+                            this.state.itemData && this.state.itemData.map((item, index) => {                                
+                                return this.state.itemPopupData && Object.keys(this.state.itemPopupData).map((val,ind)=>{
+                                    if(this.state.itemPopupData[val].id === item.id){
+                                        return <div key={index}>{item.name}</div>
+                                    }
+                                })
+                            })
+                        }
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button color="secondary" onClick={this.toggleItemPopup}>Close</Button>
                     </ModalFooter>
                 </Modal>
             </Layout>

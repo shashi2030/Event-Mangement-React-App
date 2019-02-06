@@ -5,9 +5,10 @@
  * @author Shashi Kapoor Singh
  */
 import React, { Component } from 'react';
-import { Row, Col, Button, Form, FormGroup, Label, Input, FormFeedback } from 'reactstrap';
+import { Row, Col, Button, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon } from 'reactstrap';
 import { Layout } from '../../Common/Layout/Layout';
 import { vendorActions } from '../../../actions/vendor.actions';
+import { itemActions } from '../../../actions/item.actions';
 import BreadCrumb from '../../Common/Breadcrumb/Breadcrumb';
 import { AlertBox } from '../../Common/AlertBox/AlertBox';
 
@@ -15,11 +16,12 @@ import { AlertBox } from '../../Common/AlertBox/AlertBox';
  * Define constant for the Vendor Form
  */
 const vendorform = {
-    vendortype:"",
+    vendortype: "",
     name: "",
     contact: "",
     email: "",
-    description:"",
+    itemList: [],
+    description: "",
     submitted: false,
     saveEnable: false,
     errormessage: "",
@@ -60,6 +62,28 @@ class CreateVendor extends Component {
         }
     }
 
+    componentDidMount() {
+        this.itemAPICall();
+    }
+
+    /**
+    * Description: itemAPICall function to fetch all item data based on parameter
+    * @param  {null}
+    * @return {null}
+    */
+    itemAPICall = () => {
+        itemActions
+            .listItem()
+            .then(response => {
+                this.setState({
+                    itemData: response.data
+                })
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
     /**
      * Description: handleSubmit will call when vendor submit form
      * @param  {event} e
@@ -70,15 +94,16 @@ class CreateVendor extends Component {
         this.setState({
             submitted: true
         })
-        let { name, contact, email, description, vendortype } = this.state;
+        let { name, contact, email, itemList, description, vendortype } = this.state;
         let vendordata = {
-            vendortype:vendortype,
+            vendortype: vendortype,
             name: name,
             contact: contact,
             email: email,
-            description:description            
+            items: itemList,
+            description: description
         };
-        if (name && contact) {
+        if (name && contact && itemList.length) {
             vendorActions.createVendor(vendordata).then(response => {
                 if (response.status === 201) {
                     this.setState({
@@ -113,14 +138,35 @@ class CreateVendor extends Component {
     handleback = () => {
         this.props.history.push('/listvendor');
     }
+   
+    itemOnChange = (e,id,index) =>{
+        let items = [...this.state.itemData]
+        let checkedItem = {
+            id:items[index].id
+        }
+        let selectedItem = [...this.state.itemList]
+
+        if(e.target.checked){
+            selectedItem.push(checkedItem)
+        }else{
+            let findInd =  selectedItem.findIndex(val=>{
+                return val.id === id
+            })
+            selectedItem.splice(findInd,1)
+        }        
+        this.setState({
+            itemList:selectedItem
+        })
+    }
 
     /**
      * render to html
      * @param {null}
      * @return {Object}
      */
-    render() { 
-        const { name, contact, email, description, submitted, errormessage, vendortype } = this.state;
+    render() {
+        console.log(this.state.itemList);
+        const { name, contact, email, itemList, itemData, description, submitted, errormessage, vendortype } = this.state;
         const breadcrumbdata = [
             {
                 "id": "home",
@@ -145,7 +191,7 @@ class CreateVendor extends Component {
         ]
         const creatButtonActive = () => {
             let isActive = false;
-            if (!name && !contact && !email && !description && !vendortype) {
+            if (!name && !contact && !email && !description && !vendortype && !itemList.length) {
                 isActive = true;
             }
             return isActive;
@@ -181,20 +227,49 @@ class CreateVendor extends Component {
                             <FormGroup row>
                                 <Label for="contact" sm={3}>Contact No</Label>
                                 <Col sm={9}>
-                                <Input type="number" name="contact" invalid={submitted && !contact} value={contact} id="contact" onChange={this.handleChange} placeholder="Enter Contact No" />
+                                    <Input type="number" name="contact" invalid={submitted && !contact} value={contact} id="contact" onChange={this.handleChange} placeholder="Enter Contact No" />
                                     {submitted && !contact && <FormFeedback>Enter Contact No.</FormFeedback>}
                                 </Col>
                             </FormGroup>
                             <FormGroup row>
                                 <Label for="email" sm={3}>Email</Label>
                                 <Col sm={9}>
-                                <Input type="email" name="email" value={email} id="email" onChange={this.handleChange} placeholder="Enter Email" />                                   
+                                    <Input type="email" name="email" value={email} id="email" onChange={this.handleChange} placeholder="Enter Email" />
+                                </Col>
+                            </FormGroup>
+                            <FormGroup row>
+                                <Label for='item' sm={3}>Item</Label>
+                                <Col sm={9}>
+                                    {itemData && itemData.map((itemObj, ind) => {
+                                        
+                                            return <FormGroup check inline key={itemObj.id}>
+                                                <Label check>
+                                                    <Input type="checkbox" onChange={(e) => this.itemOnChange(e,itemObj.id,ind)} id={itemObj.id} /> {itemObj.name}
+                                                </Label>
+                                            </FormGroup>
+                                       
+
+                                    })}
+
+                                    {/* <InputGroup>
+                                        <Input type="text" name='item' value={item} invalid={submitted && itemList.length===0}  id='item' onChange={this.handleChange} placeholder="Enter Item Name" />                                        
+                                        <InputGroupAddon addonType="append">
+                                            <Button type="button" color="secondary" disabled={item === ""} onClick={this.addItem}><i className="fa fa-plus" aria-hidden="true"></i></Button>
+                                        </InputGroupAddon>
+                                    </InputGroup>                                    
+                                    <ul className="member-list">                                    
+                                    {
+                                        this.state.itemList &&  this.state.itemList.map((item,index)=>{
+                                            return <li key={index}>{item} <i className="fa fa-times" aria-hidden="true" onClick={() => this.deleteItem(index)}></i></li>
+                                        })
+                                    }
+                                    </ul> */}
                                 </Col>
                             </FormGroup>
                             <FormGroup row>
                                 <Label for="description" sm={3}>Description</Label>
                                 <Col sm={9}>
-                                    <Input type="textarea" rows="4" name="description" id="description" value={description} onChange={this.handleChange} placeholder="Enter Description" />                                    
+                                    <Input type="textarea" rows="4" name="description" id="description" value={description} onChange={this.handleChange} placeholder="Enter Description" />
                                 </Col>
                             </FormGroup>
                             <FormGroup>

@@ -118,18 +118,18 @@ class CreateEvent extends Component {
         this.setState({
             submitted: true
         })
-        let { name, date, members, SelectedVendor, selectedItemData, totalprice, totalcollection, description } = this.state;
+        let { name, date, addedMembers, newVendorObj, selectedItemData, totalprice, totalcollection, description } = this.state;
+
         let vendordata = {
             name: name,
             date: date,
-            members: members,
-            vendor: SelectedVendor,
+            members: addedMembers,
+            vendor: newVendorObj,
             items: selectedItemData,
             totalprice: totalprice,
             totalcollection: totalcollection,
             description: description
         };
-        console.log(vendordata);
         if (name && date) {
             eventActions.createEvent(vendordata).then(response => {
                 if (response.status === 201) {
@@ -237,12 +237,21 @@ class CreateEvent extends Component {
                 let vendorData = {}
                 let SelectedVendor = { ...this.state.SelectedVendor };
                 for (let i = 0; i < response.data.length; i++) {
+
+                    let itemObj = {}
+                    for (let s = 0; s < response.data[i]['items'].length; s++) {
+                        itemObj[s] = { ...response.data[i]['items'][s], checked: false }
+                    }
+                    response.data[i]['items'] = itemObj;
+
                     if (vendorData[response.data[i].vendortype]) {
                         vendorData[response.data[i].vendortype].push(response.data[i]);
                     } else {
                         vendorData[response.data[i].vendortype] = [response.data[i]]
                     }
+
                 }
+                //console.log(vendorData);
                 this.setState({
                     vendorData: vendorData,
                     SelectedVendor: SelectedVendor,
@@ -322,16 +331,16 @@ class CreateEvent extends Component {
         })
     }
 
-    selectUser = (e, id, name) => {
+    selectUser = (e, userObj) => {
         var selectMember = [...this.state.tempMember];
         if (!e.target.checked) {
-            var checkedIndex = selectMember.findIndex(val => val.id == id);
+            var checkedIndex = selectMember.findIndex(val => val.id == userObj.id);
             selectMember.splice(checkedIndex, 1);
             this.setState({
                 tempMember: selectMember
             })
         } else {
-            selectMember.push({ "id": id, "username": name });
+            selectMember.push(userObj);
             this.setState({
                 tempMember: selectMember
             })
@@ -339,8 +348,12 @@ class CreateEvent extends Component {
     }
 
     addSelectedMember = () => {
+        let selectMember = this.state.tempMember.map(val => {
+            return { id: val.id }
+        })
         this.setState({
             members: this.state.tempMember,
+            addedMembers: selectMember,
             modal: !this.state.modal
         })
     }
@@ -400,22 +413,69 @@ class CreateEvent extends Component {
         })
     }
 
-    handleChangeVendor = (type, e) => {
+    handleChangeVendor = (type, e, itemsData) => {
         let data = { ...this.state.tempSelectedVendor }
-        data[type] = { "selectedValue": e.target.selectedIndex - 1, name: e.target.selectedOptions[0].value, id: e.target.selectedOptions[0].id }
+        let itemIndex = this.state.vendorData[type].findIndex(item => {
+            return item.id == e.target.selectedOptions[0].id
+        })
+        data[type] = { "selectedValue": e.target.selectedIndex - 1, name: e.target.selectedOptions[0].value, id: e.target.selectedOptions[0].id, items: this.state.vendorData[type][itemIndex].items }
         this.setState({
             ...this.state,
             tempSelectedVendor: data
         })
     }
     addSelectedVendor = () => {
-        if (this.state.tempSelectedVendor !== undefined || this.state.tempSelectedVendor !== null) {
+        let tempselectedvendor = { ...this.state.tempSelectedVendor };
+
+        if (tempselectedvendor !== undefined || tempselectedvendor !== null) {
+            let newObj = {}
+            for (let x in tempselectedvendor) {
+                let test = []
+                for (let y in tempselectedvendor[x]['items']) {
+                    if (tempselectedvendor[x]['items'][y]['checked']) {
+                        test.push({ id: tempselectedvendor[x]['items'][y]['id'] })
+                    }
+                }
+                newObj[x] = { id: tempselectedvendor[x]['id'], items: [...test] }
+            }
             this.setState({
                 ...this.state,
-                SelectedVendor: this.state.tempSelectedVendor,
+                SelectedVendor: tempselectedvendor,
+                newVendorObj: newObj,
                 modal: !this.state.modal
             })
         }
+    }
+
+    itemOnChange = (e, type, index) => {
+        let itemdata = { ...this.state.tempSelectedVendor };
+        if (e.target.checked) {
+            itemdata[type].items[index].checked = true;
+        } else {
+            itemdata[type].items[index].checked = false;
+        }
+        this.setState({
+            tempSelectedVendor: itemdata
+        })
+
+    }
+
+    renderItemList = (type) => {
+        let itemcheckbox = []
+        let items = this.state.tempSelectedVendor[type].items;
+        let itemlist = this.state.itemData;
+        itemlist.filter(item => {
+            Object.keys(this.state.tempSelectedVendor[type].items).filter((value, ind) => {
+                if (items[value].id == item.id) {
+                    itemcheckbox.push(<FormGroup check inline key={"item" + ind}>
+                        <Label check>
+                            <Input type="checkbox" id={item.id} checked={this.state.tempSelectedVendor[type].items[ind].checked} onChange={(e) => this.itemOnChange(e, type, ind)} /> {item.name}
+                        </Label>
+                    </FormGroup>)
+                }
+            })
+        })
+        return itemcheckbox;
     }
 
     renderPopupData = () => {
@@ -441,6 +501,7 @@ class CreateEvent extends Component {
                 renderData = (
                     <div>
                         {this.state.vendorData && Object.keys(this.state.vendorData).map((value, index) => {
+
                             return (<Row key={index}>
                                 <Col sm="12" md={{ size: 8, offset: 2 }}>
                                     <FormGroup row>
@@ -453,7 +514,11 @@ class CreateEvent extends Component {
                                                         return <option key={ind} id={val.id} >{val.name}</option>
                                                     })
                                                 }
+
                                             </Input>
+                                            <div>
+                                                {Object.entries(this.state.tempSelectedVendor).length && this.state.tempSelectedVendor[value] ? this.renderItemList(value) : null}
+                                            </div>
                                         </Col>
                                     </FormGroup>
                                 </Col>
@@ -492,6 +557,7 @@ class CreateEvent extends Component {
      * @return {Object}
      */
     render() {
+        //console.log(this.state.tempSelectedVendor);
         const { name, date, members, vendors, items, totalprice, totalcollection, selectedItemData, SelectedVendor, description, submitted, errormessage } = this.state;
         const breadcrumbdata = [
             {
@@ -580,21 +646,7 @@ class CreateEvent extends Component {
                                     {submitted && Object.entries(SelectedVendor).length === 0 && <div className="custom-error invalid-feedback">Select Vendor.</div>}
                                 </Col>
                             </FormGroup>
-                            <FormGroup row>
-                                <Label for="items" sm={3}>Add Items</Label>
-                                <Col sm={9}>
-                                    {
-                                        this.state.itemData && this.state.itemData.map((item, index) => {
-                                            return <FormGroup check inline key={index}>
-                                                <Label check>
-                                                    <Input type="checkbox" name={item.name} id={item.id} onChange={this.handleChangeItem} /> {item.name}
-                                                </Label>
-                                            </FormGroup>
-                                        })
-                                    }
-                                    {submitted && !selectedItemData.length && <div className="custom-error invalid-feedback">Select Item.</div>}
-                                </Col>
-                            </FormGroup>
+
                             <FormGroup row>
                                 <Label for="totalprice" sm={3}>Total Price</Label>
                                 <Col sm={9}>

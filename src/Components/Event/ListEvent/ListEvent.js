@@ -11,6 +11,7 @@ import Grid from '../../Common/Grid/Grid';
 import { eventActions } from '../../../actions/event.actions';
 import BreadCrumb from '../../Common/Breadcrumb/Breadcrumb';
 import { AlertBox } from '../../Common/AlertBox/AlertBox';
+import EventPopup from './EventPopup';
 
 /**
  * Define Constant of Table column Definition
@@ -21,13 +22,11 @@ const colDef = {
     "date": { "label": "Event Date", 'sort': true, "display": true },
     "members": { "label": "Members", 'sort': true, "display": true },
     "vendor": { "label": "Vendor", 'sort': true, "display": true },
-    "items": { "label": "Items", 'sort': true, "display": true },
-    "totalprice": { "Total Price": "Total Price", 'sort': true, "display": true },
-    "totalcollection": { "Total Collection": "Total Collection", 'sort': true, "display": true },
-    "description": { "Description": "Items", 'sort': true, "display": true },
+    "totalprice": { "label": "Total Price", 'sort': true, "display": true },
+    "totalcollection": { "label": "Total Collection", 'sort': true, "display": true },
+    "description": { "label": "Description", 'sort': true, "display": true },
     "options": {
-        "label": "Options","class":"options", 'sort': true, "display": true, "list": [
-            { "action": "view", "label": "View" },
+        "label": "Options", "class": "options", 'sort': true, "display": true, "list": [
             { "action": "edit", "label": "Edit" },
             { "action": "delete", "label": "Delete" }
         ]
@@ -55,7 +54,8 @@ class ListEvent extends Component {
             modal: false,
             confirmDeleteId: null,
             alertMessage: "",
-            alertVisible: false
+            alertVisible: false,
+            popup: false
         }
     }
     /**
@@ -74,7 +74,7 @@ class ListEvent extends Component {
      */
     eventAPICall = () => {
         let data = {
-            pageNo: this.state.currentPage,
+            id: this.state.currentPage,
             pageLimit: this.state.countPerPage
         }
         eventActions
@@ -180,6 +180,7 @@ class ListEvent extends Component {
      * @return {null}
      */
     eventEdit = (id) => {
+        console.log(id);
         this.props.history.push('/editevent/' + id);
     }
 
@@ -240,9 +241,38 @@ class ListEvent extends Component {
         this.props.history.push('/createevent');
     }
 
-    popupAction =(id,type) =>{
-        console.log(id);
-        console.log(type);
+    popupAction = (id, type, index) => {
+        let data = this.state.data[index];
+        switch (type) {
+            case 'members':
+                this.setState({
+                    popupData: {
+                        data: data.members,
+                        type: type,
+                        title: 'Member List'
+                    },
+                    popup: !this.state.popup
+                })
+                break;
+            case 'vendor':
+                this.setState({
+                    popupData: {
+                        data: data.vendor,
+                        type: type,
+                        title: 'Vendor List'
+                    },
+                    popup: !this.state.popup
+                })
+                break;
+            default:
+
+        }
+    }
+
+    closeEventPopup = () => {
+        this.setState({
+            popup: !this.state.popup
+        })
     }
 
 
@@ -272,6 +302,13 @@ class ListEvent extends Component {
                 <BreadCrumb data={breadcrumbdata} />
                 <h1>Event List</h1>
                 <AlertBox isOpen={this.state.alertVisible} toggle={this.onDismiss} closeAlert={this.closeAlert} message={this.state.alertMessage} />
+                {this.state.popup && <EventPopup
+                    popupOpen={this.state.popup}
+                    closeEventPopup={this.closeEventPopup}
+                    data={this.state.popupData.data}
+                    type={this.state.popupData.type}
+                    heading={this.state.popupData.title}
+                />}
                 <div className="button-row text-right">
                     <Button type="button" onClick={this.createEvent} color="primary">Create Event</Button>
                 </div>
@@ -286,7 +323,7 @@ class ListEvent extends Component {
                         nextPage={this.nextPage}
                         prevPage={this.prevPage}
                         actionType={this.actionType}
-                        popupAction = {this.popupAction}
+                        popupAction={this.popupAction}
                     />
                 </div>
                 <Modal isOpen={this.state.modal} toggle={this.toggle} className="modal-dialog modal-dialog-centered">

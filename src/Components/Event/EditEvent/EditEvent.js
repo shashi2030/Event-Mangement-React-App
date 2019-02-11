@@ -1,7 +1,7 @@
 /**
- * Summary : Create Event
- * Description: Create Event
- * @link: /createevent
+ * Summary : Edit Event
+ * Description: Edit Event
+ * @link: /editevent
  * @author Shashi Kapoor Singh
  */
 import React, { Component } from 'react';
@@ -15,7 +15,7 @@ import { itemActions } from '../../../actions/item.actions';
 import BreadCrumb from '../../Common/Breadcrumb/Breadcrumb';
 import { AlertBox } from '../../Common/AlertBox/AlertBox';
 import ModalPopup from '../../Common/ModalPopup/ModalPopup';
-require('./css/createevent.css');
+require('./css/editevent.css');
 /**
  * Define Constant of Table column Definition
  */
@@ -31,15 +31,10 @@ const colDef = {
  * Define constant for the Event Form
  */
 const eventform = {
+    id: null,
     name: "",
     date: "",
     members: [],
-    vendors: {
-        vendor1: "",
-        vendor2: "",
-        vendor3: ""
-    },
-    items: [],
     totalprice: "",
     totalcollection: "",
     description: "",
@@ -54,7 +49,9 @@ const eventform = {
     addedMember: [],
     tempMember: [],
     vendorData: {},
-    SelectedVendor: {}
+    SelectedVendor: {},
+    selectedItemData: [],
+    mainvendor : []
 }
 
 const popupDescription = {
@@ -72,7 +69,7 @@ const popupDescription = {
  * @name CreateEvent
  * @extends React.Component
  */
-class CreateEvent extends Component {
+class EditEvent extends Component {
     /**
      * State is initialised
      * 1) handle projection field attribute
@@ -84,29 +81,31 @@ class CreateEvent extends Component {
     }
 
     componentDidMount() {
+        this.getEvent();
         this.itemAPICall();
-        this.fetchUser();
     }
 
     /**
-     * Description: userAPICall function to fetch all user data based on parameter
+     * Description: getItem function to fetch the item data based on params id
      * @param  {null}
      * @return {null}
      */
-    fetchUser = () => {
-        userActions
-            .listUser()
-            .then(response => {
-                this.setState({
-                    membersData: response.data,
-                    selectedUserList: this.state.members,
-                    tempMember:this.state.members
-                })
+    getEvent = () => {
+        const id = this.props.match.params.id;
+        eventActions.viewEvent(id).then(response => {
+            let newData = response.data;
+            console.log(newData);
+            this.setState({
+                ...newData,
+                eventData: response.data
+            }, () => {
+                this.fetchUser();
             })
-            .catch(error => {
-                console.log(error);
-            });
+        }).catch((error) => {
+            console.log(error);
+        })
     }
+
     /**
      * Description: handleChange will call when Event type any text boxes or element
      * @param  {event} e
@@ -136,25 +135,21 @@ class CreateEvent extends Component {
         this.setState({
             submitted: true
         })
-        let { name, date, addedMembers, newVendorObj, totalprice, totalcollection, description } = this.state;
-
-        
-        
+        let { id,name, date, members, vendor, totalprice, totalcollection, description } = this.state;
         let vendordata = {
             name: name,
             date: date,
-            members: addedMembers,
-            vendor: newVendorObj,
+            members: members,
+            vendor: vendor,
             totalprice: totalprice,
             totalcollection: totalcollection,
             description: description
         };
         if (name && date) {
-            eventActions.createEvent(vendordata).then(response => {
-                if (response.status === 201) {
+            eventActions.editEvent(id,vendordata).then(response => {
+                if (response.status === 200) {
                     this.setState({
-                        ...eventform,
-                        errormessage: "Data Create Successfully",
+                        errormessage: "Data Update Successfully",
                         alertVisible: true
                     })
                 }
@@ -219,6 +214,35 @@ class CreateEvent extends Component {
             this.setPopupType(this.state.popupType);
         })
     }
+    /**
+     * Description: userAPICall function to fetch all user data based on parameter
+     * @param  {null}
+     * @return {null}
+     */
+    fetchUser = () => {
+        this.vendorAPICall(true);
+       
+        userActions
+            .listUser()
+            .then(response => {
+                this.setState({
+                    membersData: response.data,
+                    selectedUserList: this.state.members,
+                    tempMember:this.state.members
+                })
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+    createIdString = () => {
+        let data = this.state.members;
+        let output = '';
+        data.map(val => {
+            output += 'id=' + val.id + '&'
+        })
+        return output;
+    }
 
     /**
      * Description: userAPICall function to fetch all user data based on parameter
@@ -255,6 +279,7 @@ class CreateEvent extends Component {
             .then(response => {
                 let vendorData = {}
                 let SelectedVendor = { ...this.state.SelectedVendor };
+                
                 for (let i = 0; i < response.data.length; i++) {
 
                     let itemObj = {}
@@ -270,17 +295,45 @@ class CreateEvent extends Component {
                     }
 
                 }
+                SelectedVendor = this.test(response.data)
                 this.setState({
                     vendorData: vendorData,
                     SelectedVendor: SelectedVendor,
-                    tempSelectedVendor: SelectedVendor
+                    tempSelectedVendor: SelectedVendor,
+                    mainvendor:response.data
                 })
+                
             })
             .catch(error => {
                 console.log(error);
             });
     }
 
+    test(vendorData) {
+        let vendord = [...this.state.vendor];
+        let newObj = {}
+        var abc = vendord.filter(v=>{
+            vendorData.filter((v1,i)=>{                
+                if(v1.id == v.id){
+                    newObj[v1.vendortype] = {
+                        selectedValue:i,
+                        name:v1.name,
+                        id:v1.id,
+                        items:v1.items
+                    }
+                    Object.keys(v1.items).filter(itemv=>{                        
+                        v.items.filter(v=>{                           
+                            if(v == v1.items[itemv].id){
+                                newObj[v1.vendortype].items[itemv].checked = true
+                            }
+                        })
+                    })
+                }
+            })
+        })
+         return newObj;
+
+    }
     /**
      * Description: itemAPICall function to fetch all item data based on parameter
      * @param  {null}
@@ -352,7 +405,7 @@ class CreateEvent extends Component {
     selectUser = (e, userObj) => {
         var selectMember = [...this.state.tempMember];
         if (!e.target.checked) {
-            var checkedIndex = selectMember.findIndex(val => val == userObj.id);
+            var checkedIndex = selectMember.findIndex(val => val.id == userObj.id);
             selectMember.splice(checkedIndex, 1);
             this.setState({
                 tempMember: selectMember
@@ -366,10 +419,8 @@ class CreateEvent extends Component {
     }
 
     addSelectedMember = () => {
-        //console.log(this.state.tempMember)
         let selectMember = this.state.tempMember.map(val => {
-            //console.log(val.id)
-            return val
+            return { id: val.id }
         })
         this.setState({
             members: this.state.tempMember,
@@ -404,7 +455,7 @@ class CreateEvent extends Component {
                         tempMemberData.splice(ind, 1)
                     }
                 })
-            })
+            })           
             this.setState({
                 tempMember: tempMemberData
             })
@@ -416,7 +467,7 @@ class CreateEvent extends Component {
         members.splice(index, 1);
         let tempMemberData = [...this.state.tempMember];
         let findIndex = tempMemberData.findIndex((val) => {
-            return val === id
+            return val.id === id
         });
         tempMemberData.splice(findIndex, 1);
         this.setState({
@@ -448,8 +499,7 @@ class CreateEvent extends Component {
         let tempselectedvendor = { ...this.state.tempSelectedVendor };
 
         if (tempselectedvendor !== undefined || tempselectedvendor !== null) {
-            let addedVendor = []
-            
+            let newObj = []
             for (let x in tempselectedvendor) {
                 let test = []
                 for (let y in tempselectedvendor[x]['items']) {
@@ -457,12 +507,12 @@ class CreateEvent extends Component {
                         test.push(tempselectedvendor[x]['items'][y]['id'])
                     }
                 }
-                addedVendor.push({ id: tempselectedvendor[x]['id'], items: [...test] })
+                newObj.push({ id: tempselectedvendor[x]['id'], items: [...test] })
             }
             this.setState({
                 ...this.state,
                 SelectedVendor: tempselectedvendor,
-                newVendorObj: addedVendor,
+                vendor: newObj,
                 modal: !this.state.modal
             })
         }
@@ -578,7 +628,9 @@ class CreateEvent extends Component {
      * @return {Object}
      */
     render() {
-        const { name, date, members, vendors, items, totalprice, totalcollection, selectedItemData, SelectedVendor, description, submitted, errormessage } = this.state;
+        console.log(this.state)
+        const { id, name, date, members, vendors, items, totalprice, totalcollection, selectedItemData, SelectedVendor, description, submitted, errormessage } = this.state;
+        
         const breadcrumbdata = [
             {
                 "id": "home",
@@ -611,11 +663,17 @@ class CreateEvent extends Component {
         return (
             <Layout>
                 <BreadCrumb data={breadcrumbdata} />
-                <h1>Create Event</h1>
+                <h1>Edit Event</h1>
                 <AlertBox isOpen={this.state.alertVisible} toggle={this.onDismiss} closeAlert={this.closeAlert} message={errormessage} />
                 <Row>
                     <Col sm="12" md={{ size: 8, offset: 2 }}>
                         <Form onSubmit={this.handleSubmit}>
+                            <FormGroup row>
+                                <Label for="name" sm={3}>Event ID</Label>
+                                <Col sm={9}>
+                                    <p>{id}</p>
+                                </Col>
+                            </FormGroup>
                             <FormGroup row>
                                 <Label for="name" sm={3}>Event Name</Label>
                                 <Col sm={9}>
@@ -634,6 +692,7 @@ class CreateEvent extends Component {
                                 <Label for="members" sm={3}>Members</Label>
                                 <Col sm={9}>
                                     <button type="button" onClick={() => this.addMember('member')}><i className="fa fa-user-plus" aria-hidden="true"></i></button>
+                                    
                                     {
                                         members.length ?
                                             <ul className="member-list">
@@ -659,8 +718,8 @@ class CreateEvent extends Component {
                                             <ul className="member-list vendorlist">
                                                 {
                                                     SelectedVendor && Object.keys(SelectedVendor).map((value, index) => {
-                                                        return <li key={index}> <label>{value} : </label> <span>{this.state.vendorData[value][SelectedVendor[value].selectedValue].name}</span> <i className="fa fa-times" aria-hidden="true" onClick={() => this.deleteVendor(value)} ></i></li>
-
+                                                        return <li key={index}> <label>{value} : </label> <span>{SelectedVendor[value].name}</span> <i className="fa fa-times" aria-hidden="true" onClick={() => this.deleteVendor(value)} ></i></li>
+                                                       
                                                     })
                                                 }
                                             </ul> : null
@@ -691,8 +750,8 @@ class CreateEvent extends Component {
                             </FormGroup>
                             <FormGroup>
                                 <Col sm={{ size: 9, offset: 3 }}>
-                                    <Button type="submit" disabled={creatButtonActive()} onClick={this.handleSubmit} color="primary">Create</Button> {' '}
-                                    <Button type="button" onClick={this.handleback} color="secondary">Cancel</Button>
+                                    <Button type="submit" disabled={creatButtonActive()} onClick={this.handleSubmit} color="primary">Update</Button> {' '}
+                                    <Button type="button" onClick={this.handleback} color="secondary">Reset</Button>
                                 </Col>
                             </FormGroup>
                         </Form>
@@ -715,4 +774,4 @@ class CreateEvent extends Component {
     }
 }
 
-export default CreateEvent;
+export default EditEvent;

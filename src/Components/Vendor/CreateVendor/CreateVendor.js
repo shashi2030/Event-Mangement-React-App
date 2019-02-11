@@ -68,13 +68,14 @@ class CreateVendor extends Component {
 
     /**
     * Description: itemAPICall function to fetch all item data based on parameter
-    * @param  {null}
+    * @param  {null} 
     * @return {null}
     */
     itemAPICall = () => {
         itemActions
             .listItem()
             .then(response => {
+                console.log(response.data)
                 this.setState({
                     itemData: response.data
                 })
@@ -165,7 +166,6 @@ class CreateVendor extends Component {
      * @return {Object}
      */
     render() {
-        console.log(this.state.itemList);
         const { name, contact, email, itemList, itemData, description, submitted, errormessage, vendortype } = this.state;
         const breadcrumbdata = [
             {

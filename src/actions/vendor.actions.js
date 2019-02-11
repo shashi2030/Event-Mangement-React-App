@@ -22,7 +22,14 @@ export const vendorActions = {
 * @return {json} req_response
 */
 function listVendor (requestData) {
-    let url = uriConstants.vendor + '?_page=' + requestData.pageNo + '&_limit=' + requestData.pageLimit;
+    
+    let url = '';
+    if(requestData.pageNo !== undefined && requestData.pageLimit !== undefined){
+        url = uriConstants.vendor + '?_page=' + requestData.pageNo + '&_limit=' + requestData.pageLimit;
+    }else{
+        url = uriConstants.vendor;
+    }
+    console.log(url)
     return baseService.get(url, Header.JSON(), {}).then(response => {
         return Response(response);
     })

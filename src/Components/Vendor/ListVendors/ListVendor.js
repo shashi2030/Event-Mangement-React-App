@@ -25,8 +25,7 @@ const colDef = {
     "items": { "label": "Items", 'sort': true, "display": true },
     "description": { "label": "Description", 'sort': true, "display": true },
     "options": {
-        "label": "Options", "class": "options", "sort": true, "display": true, "list": [
-            { "action": "view", "label": "View" },
+        "label": "Options", "class": "options", "sort": true, "display": true, "list": [            
             { "action": "edit", "label": "Edit" },
             { "action": "delete", "label": "Delete" }
         ]

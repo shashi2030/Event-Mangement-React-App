@@ -6,7 +6,7 @@
 import { baseService } from '../services/service';
 import * as Header from '../services/header.api';
 import { uriConstants } from '../constants'
-import {Response} from './response.action';
+import { Response } from './response.action';
 
 export const userActions = {
     listUser,
@@ -21,14 +21,22 @@ export const userActions = {
 * @param {object} requestData
 * @return {json} req_response
 */
-function listUser (requestData) {
-    let url = uriConstants.user + '?_page=' + requestData.pageNo + '&_limit=' + requestData.pageLimit;
+function listUser(requestData) {
+    let url = '';
+    if(requestData ===undefined || requestData ==='undefined'){
+        url=uriConstants.user;
+    }else if (requestData.filterId === 'undefined' || requestData.filterId === undefined) {
+        url = uriConstants.user + '?_page=' + requestData.pageNo + '&_limit=' + requestData.pageLimit;
+    } else {
+        url = uriConstants.user + '?' + requestData.filterId;
+    }
+    console.log(url)
     return baseService.get(url, Header.JSON(), {}).then(response => {
         return Response(response);
     })
-    .catch(error => {
-        return error;
-    });
+        .catch(error => {
+            return error;
+        });
 
 };
 
@@ -37,7 +45,7 @@ function listUser (requestData) {
 * @param {object} requestData
 * @return {json} req_response
 */
-function createUser (requestData) {
+function createUser(requestData) {
     let url = uriConstants.user;
     return baseService.post(url, Header.JSON(), requestData).then(response => {
         return response;
@@ -50,8 +58,8 @@ function createUser (requestData) {
 * @param {object} requestData
 * @return {json} req_response
 */
-function editUser (userId,requestData) {
-    let url = uriConstants.user+"/"+userId;
+function editUser(userId, requestData) {
+    let url = uriConstants.user + "/" + userId;
     return baseService.put(url, Header.JSON(), requestData).then(response => {
         return response;
     });
@@ -62,8 +70,8 @@ function editUser (userId,requestData) {
 * @param {number} userId
 * @return {json} req_response
 */
-function deleteUser (userId) {
-    let url = uriConstants.user + "/"+userId;
+function deleteUser(userId) {
+    let url = uriConstants.user + "/" + userId;
     return baseService.delete(url, Header.JSON(), {}).then(response => {
         return response;
     });
@@ -74,8 +82,8 @@ function deleteUser (userId) {
 * @param {number} userId
 * @return {json} req_response
 */
-function viewUser (userId) {
-    let url = uriConstants.user + "/"+userId;
+function viewUser(userId) {
+    let url = uriConstants.user + "/" + userId;
     return baseService.get(url, Header.JSON(), {}).then(response => {
         return response;
     });

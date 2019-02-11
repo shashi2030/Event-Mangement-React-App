@@ -21,8 +21,13 @@ export const eventActions = {
 * @param {object} requestData
 * @return {json} req_response
 */
-function listEvent (requestData) {
-    let url = uriConstants.event + '?_page=' + requestData.pageNo + '&_limit=' + requestData.pageLimit;
+function listEvent (requestData) {    
+    let url = '';
+    if(requestData.filterId === 'undefined' || requestData.filterId === undefined){
+        url = uriConstants.event + '?_page=' + requestData.id + '&_limit=' + requestData.pageLimit;
+    }else{
+        url = uriConstants.filterId + '?' + requestData.filterId;
+    }
     return baseService.get(url, Header.JSON(), {}).then(response => {
         return Response(response);
     })

@@ -49,20 +49,19 @@ class Grid extends Component {
 
     findSelectedId =(id)=>{
          let selectedUserList = this.props.tempMember;
-         let matchData = selectedUserList.findIndex(val => val['id']==id);
+         let matchData = selectedUserList.findIndex(val => val==id);
          return matchData === -1?false:true;
     }
 
     selectedAll = () =>{
         let currentPageData = this.props.data;
         let selectedLength = 0;
+        
         for(let i = 0; i < currentPageData.length;i++){
-           if(!this.findSelectedId(currentPageData[i].id)){
-                break;
-           }
-           selectedLength++;
+            if(this.findSelectedId(currentPageData[i].id)){
+                selectedLength++;
+            }
         }
-
         return selectedLength === currentPageData.length ? true:false;
     }
 
@@ -121,7 +120,7 @@ class Grid extends Component {
                                                 })}
                                             </ButtonGroup></td>
                                         } else if(val === 'members' || val === 'vendor' || val === 'items'){
-                                            return <td key={ind}><Button key={ind} outline color="info" onClick={()=>this.props.popupAction(value.id,val)}>{val}</Button></td>
+                                            return <td key={ind}><Button key={ind} outline color="info" onClick={()=>this.props.popupAction(value.id,val,index)}>{val}</Button></td>
                                         }else {
                                             return <td key={ind}>{value[val]}</td>
                                         }
@@ -133,13 +132,16 @@ class Grid extends Component {
                         </tbody>
                     </Table>
                 </div>
-                <Paging
+                {
+                    this.props.countPerPage ? <Paging
                     previousDisable={prevBtnDisabled}
                     nextDisable={nextBtnDisabled}
                     prevClick={this.props.prevPage}
                     nextClick={this.props.nextPage}
                     data={renderPageNumbers}
-                />
+                />:null
+                }                
+                
             </div>
         )
     }

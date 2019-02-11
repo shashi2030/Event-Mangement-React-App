@@ -1,0 +1,18 @@
+.item-list-popup{
+    padding:0;
+}
+.item-list-popup li{
+    border:solid 1px gray;
+    list-style:none;
+    display: inline-block;
+    padding:5px 30px 5px 10px;
+    border-radius: 4px;
+    position: relative;
+    background: #fcfeff; /* Old browsers */
+    margin-right:5px;
+    margin-bottom:5px;
+    background: -moz-linear-gradient(top, #fcfeff 0%, #dbdbdb 100%); /* FF3.6-15 */
+    background: -webkit-linear-gradient(top, #fcfeff 0%,#dbdbdb 100%); /* Chrome10-25,Safari5.1-6 */
+    background: linear-gradient(to bottom, #fcfeff 0%,#dbdbdb 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfeff', endColorstr='#dbdbdb',GradientType=0 ); /* IE6-9 */ 
+}

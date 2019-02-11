@@ -22,11 +22,13 @@ export const itemActions = {
 * @return {json} req_response
 */
 function listItem (requestData) {
-    let url = "";
-    if(checkVariable(requestData)){
+    let url = '';
+    if(requestData ===undefined || requestData ==='undefined'){
+        url=uriConstants.item;
+    }else if(requestData.filterId === 'undefined' || requestData.filterId === undefined){
         url = uriConstants.item + '?_page=' + requestData.pageNo + '&_limit=' + requestData.pageLimit;
     }else{
-        url = uriConstants.item;
+        url = uriConstants.item + '?' + requestData.filterId;
     }
     
     return baseService.get(url, Header.JSON(), {}).then(response => {

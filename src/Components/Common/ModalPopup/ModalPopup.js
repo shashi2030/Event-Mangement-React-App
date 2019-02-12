@@ -2,9 +2,6 @@ import React, { Component } from 'react';
 import { Button, Modal, ModalHeader, ModalFooter, ModalBody } from 'reactstrap';
 
 class ModalPopup extends Component {
-    constructor(props){
-        super(props);
-    }
     footerRender = () =>{
         let data = '';
         switch(this.props.popupType){
@@ -18,6 +15,7 @@ class ModalPopup extends Component {
                 <Button color="secondary" onClick={this.props.closeModal}>Close</Button>
             </ModalFooter>)
             break;
+            default:
         }
         return data;
     }

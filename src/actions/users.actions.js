@@ -21,16 +21,16 @@ export const userActions = {
 * @param {object} requestData
 * @return {json} req_response
 */
-function listUser(requestData) {
+function listUser(requestData='all') {
     let url = '';
-    if(requestData ===undefined || requestData ==='undefined'){
+    if(requestData === 'all'){
         url=uriConstants.user;
-    }else if (requestData.filterId === 'undefined' || requestData.filterId === undefined) {
+    }else if(requestData.pageNo !== undefined && requestData.pageLimit !== undefined){
         url = uriConstants.user + '?_page=' + requestData.pageNo + '&_limit=' + requestData.pageLimit;
-    } else {
+    }else if(requestData.filterId !== undefined){
         url = uriConstants.user + '?' + requestData.filterId;
     }
-    console.log(url)
+
     return baseService.get(url, Header.JSON(), {}).then(response => {
         return Response(response);
     })

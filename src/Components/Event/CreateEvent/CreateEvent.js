@@ -100,7 +100,7 @@ class CreateEvent extends Component {
                 this.setState({
                     membersData: response.data,
                     selectedUserList: this.state.members,
-                    tempMember:this.state.members
+                    tempMember: this.state.members
                 })
             })
             .catch(error => {
@@ -138,8 +138,8 @@ class CreateEvent extends Component {
         })
         let { name, date, addedMembers, newVendorObj, totalprice, totalcollection, description } = this.state;
 
-        
-        
+
+
         let vendordata = {
             name: name,
             date: date,
@@ -201,6 +201,7 @@ class CreateEvent extends Component {
                 });
                 this.vendorAPICall();
                 break;
+            default:
         }
     }
     addMember = (type) => {
@@ -249,9 +250,8 @@ class CreateEvent extends Component {
      * @return {null}
      */
     vendorAPICall = () => {
-        let data = {}
         vendorActions
-            .listVendor(data)
+            .listVendor()
             .then(response => {
                 let vendorData = {}
                 let SelectedVendor = { ...this.state.SelectedVendor };
@@ -352,7 +352,7 @@ class CreateEvent extends Component {
     selectUser = (e, userObj) => {
         var selectMember = [...this.state.tempMember];
         if (!e.target.checked) {
-            var checkedIndex = selectMember.findIndex(val => val == userObj.id);
+            var checkedIndex = selectMember.findIndex(val => val === userObj.id);
             selectMember.splice(checkedIndex, 1);
             this.setState({
                 tempMember: selectMember
@@ -366,9 +366,7 @@ class CreateEvent extends Component {
     }
 
     addSelectedMember = () => {
-        //console.log(this.state.tempMember)
         let selectMember = this.state.tempMember.map(val => {
-            //console.log(val.id)
             return val
         })
         this.setState({
@@ -388,23 +386,23 @@ class CreateEvent extends Component {
         let allUser = [...this.state.data];
         let tempMemberData = [...this.state.tempMember];
         if (e.target.checked) {
-            allUser.filter((value, index) => {
-                if (this.findData(tempMemberData, value.id) === -1) {
-                    tempMemberData.push(value.id);
+            for (let i = 0; i < allUser.length; i++) {
+                if (this.findData(tempMemberData, allUser[i].id) === -1) {
+                    tempMemberData.push(allUser[i].id);
                 }
-            })
+            }
             this.setState({
                 ...this.state,
                 tempMember: tempMemberData
             })
         } else {
-            allUser.filter((value, index) => {
-                tempMemberData.filter((val, ind) => {
-                    if (value.id === val) {
-                        tempMemberData.splice(ind, 1)
+            for (let a = 0; a < allUser.length; a++) {
+                for (let i = 0; i < tempMemberData.length; i++) {
+                    if (allUser[a].id === tempMemberData[i]) {
+                        tempMemberData.splice(i, 1)
                     }
-                })
-            })
+                }
+            }
             this.setState({
                 tempMember: tempMemberData
             })
@@ -436,20 +434,31 @@ class CreateEvent extends Component {
     handleChangeVendor = (type, e, itemsData) => {
         let data = { ...this.state.tempSelectedVendor }
         let itemIndex = this.state.vendorData[type].findIndex(item => {
-            return item.id == e.target.selectedOptions[0].id
+            return item.id === parseInt(e.target.selectedOptions[0].id)
         })
-        data[type] = { "selectedValue": e.target.selectedIndex - 1, name: e.target.selectedOptions[0].value, id: e.target.selectedOptions[0].id, items: this.state.vendorData[type][itemIndex].items }
+        if (e.target.selectedIndex !== 0) {
+            data[type] = { "selectedValue": e.target.selectedIndex - 1, name: e.target.selectedOptions[0].value, id: e.target.selectedOptions[0].id, items: this.state.vendorData[type][itemIndex].items }
+        } else {
+            delete data[type]
+        }
         this.setState({
             ...this.state,
             tempSelectedVendor: data
         })
+    }
+    selectedVendorList = (id) => {
+        let tempVendor = this.state.tempSelectedVendor;
+        let isActive = Object.keys(tempVendor).filter(val => {
+            return parseInt(tempVendor[val].id) === id
+        })
+        return isActive.length ? true : false;
     }
     addSelectedVendor = () => {
         let tempselectedvendor = { ...this.state.tempSelectedVendor };
 
         if (tempselectedvendor !== undefined || tempselectedvendor !== null) {
             let addedVendor = []
-            
+
             for (let x in tempselectedvendor) {
                 let test = []
                 for (let y in tempselectedvendor[x]['items']) {
@@ -485,17 +494,17 @@ class CreateEvent extends Component {
         let itemcheckbox = []
         let items = this.state.tempSelectedVendor[type].items;
         let itemlist = this.state.itemData;
-        itemlist.filter(item => {
-            Object.keys(this.state.tempSelectedVendor[type].items).filter((value, ind) => {
-                if (items[value].id == item.id) {
-                    itemcheckbox.push(<FormGroup check inline key={"item" + ind}>
+        for (let i = 0; i < itemlist.length; i++) {
+            for (let a = 0; a < Object.keys(this.state.tempSelectedVendor[type].items).length; a++) {
+                if (items[a].id === itemlist[i].id) {
+                    itemcheckbox.push(<FormGroup check inline key={"item" + a}>
                         <Label check>
-                            <Input type="checkbox" id={item.id} checked={this.state.tempSelectedVendor[type].items[ind].checked} onChange={(e) => this.itemOnChange(e, type, ind)} /> {item.name}
+                            <Input type="checkbox" id={itemlist[i].id} checked={this.state.tempSelectedVendor[type].items[a].checked} onChange={(e) => this.itemOnChange(e, type, a)} /> {itemlist[i].name}
                         </Label>
                     </FormGroup>)
                 }
-            })
-        })
+            }
+        }
         return itemcheckbox;
     }
 
@@ -529,10 +538,10 @@ class CreateEvent extends Component {
                                         <Label for={value} sm={3}>{value}</Label>
                                         <Col sm={9}>
                                             <Input type="select" name={value} onChange={(e) => this.handleChangeVendor(value, e)} id={value}>
-                                                <option>None</option>
+                                                <option >None</option>
                                                 {
                                                     this.state.vendorData[value].map((val, ind) => {
-                                                        return <option key={ind} id={val.id} >{val.name}</option>
+                                                        return <option key={ind} id={val.id} selected={this.selectedVendorList(val.id)}>{val.name}</option>
                                                     })
                                                 }
 
@@ -550,26 +559,9 @@ class CreateEvent extends Component {
                     </div>
                 )
                 break;
+            default:
         }
         return renderData;
-    }
-
-    handleChangeItem = (e) => {
-        let { name, id } = e.target;
-        let selectedItem = [...this.state.selectedItemData]
-        if (e.target.checked) {
-            selectedItem.push({ name: name, id: id });
-            this.setState({
-                selectedItemData: selectedItem
-            })
-        } else {
-            var checkedIndex = selectedItem.findIndex(val => val.id == id);
-            selectedItem.splice(checkedIndex, 1);
-            this.setState({
-                selectedItemData: selectedItem
-            })
-        }
-
     }
 
     /**
@@ -578,7 +570,7 @@ class CreateEvent extends Component {
      * @return {Object}
      */
     render() {
-        const { name, date, members, vendors, items, totalprice, totalcollection, selectedItemData, SelectedVendor, description, submitted, errormessage } = this.state;
+        const { name, date, members, vendors, items, totalprice, totalcollection, SelectedVendor, description, submitted, errormessage } = this.state;
         const breadcrumbdata = [
             {
                 "id": "home",
@@ -637,14 +629,12 @@ class CreateEvent extends Component {
                                     {
                                         members.length ?
                                             <ul className="member-list">
-                                            {this.state.membersData && this.state.membersData.map((value,i)=>{
-                                                return members && members.map((v, index) => {
-                                                    if(value.id == v){
-                                                        return <li key={index}>{value.username} <i className="fa fa-times" aria-hidden="true" onClick={() => this.deleteMember(index, value.id)}></i></li>
-                                                    }
-                                                })
-                                                
-                                            })}
+                                                {this.state.membersData && this.state.membersData.map((value, i) => {
+                                                    return members && members.map((v, index) => {
+                                                        return value.id === v ? <li key={index}>{value.username} <i className="fa fa-times" aria-hidden="true" onClick={() => this.deleteMember(index, value.id)}></i></li> : null
+                                                    })
+
+                                                })}
                                             </ul> : null
                                     }
                                     {submitted && members.length === 0 && <div className="custom-error invalid-feedback">Select Member.</div>}
@@ -660,7 +650,6 @@ class CreateEvent extends Component {
                                                 {
                                                     SelectedVendor && Object.keys(SelectedVendor).map((value, index) => {
                                                         return <li key={index}> <label>{value} : </label> <span>{this.state.vendorData[value][SelectedVendor[value].selectedValue].name}</span> <i className="fa fa-times" aria-hidden="true" onClick={() => this.deleteVendor(value)} ></i></li>
-
                                                     })
                                                 }
                                             </ul> : null

@@ -5,7 +5,7 @@
  * @author Shashi Kapoor Singh
  */
 import React, { Component } from 'react';
-import { Row, Col, Button, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon } from 'reactstrap';
+import { Row, Col, Button, Form, FormGroup, Label, Input, FormFeedback} from 'reactstrap';
 import { Layout } from '../../Common/Layout/Layout';
 import { vendorActions } from '../../../actions/vendor.actions';
 import { itemActions } from '../../../actions/item.actions';
@@ -240,8 +240,7 @@ class EditVendor extends Component {
      * @return {Object}
      */
     render() {
-        console.log(this.state.items)
-        const { id, vendortype, name, contact,itemData, items, email, description, submitted, errormessage } = this.state;
+        const { id, vendortype, name, contact,itemData, email, description, submitted, errormessage } = this.state;
         const breadcrumbdata = [
             {
                 "id": "home",

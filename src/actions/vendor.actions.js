@@ -21,15 +21,17 @@ export const vendorActions = {
 * @param {object} requestData
 * @return {json} req_response
 */
-function listVendor (requestData) {
+function listVendor (requestData='all') {
     
     let url = '';
-    if(requestData.pageNo !== undefined && requestData.pageLimit !== undefined){
-        url = uriConstants.vendor + '?_page=' + requestData.pageNo + '&_limit=' + requestData.pageLimit;
-    }else{
+    if(requestData === 'all'){
         url = uriConstants.vendor;
+    }else if(requestData.pageNo !== undefined && requestData.pageLimit !== undefined){
+        url = uriConstants.vendor + '?_page=' + requestData.pageNo + '&_limit=' + requestData.pageLimit;
+    }else if(requestData.filterId !== undefined){
+        url = uriConstants.vendor + '?' + requestData.filterId;
     }
-    console.log(url)
+    
     return baseService.get(url, Header.JSON(), {}).then(response => {
         return Response(response);
     })

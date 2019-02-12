@@ -83,7 +83,6 @@ class EventPopup extends Component {
         vendorActions
             .listVendor(data)
             .then(response => {
-                console.log(response.data)
                 this.setState({
                     data: response.data,
                     colDef: colDefVendor
@@ -106,7 +105,6 @@ class EventPopup extends Component {
         itemActions
             .listItem(data)
             .then(response => {
-                console.log(response.data)
                 this.setState({
                     itemList: response.data
                 })
@@ -120,23 +118,27 @@ class EventPopup extends Component {
         let data = this.props.data;
         let output = '';
         if (this.props.type === 'members') {
-            data.map(val => {
-                output += 'id=' + val + '&'
-            })
+            for(let i = 0;i < data.length-1;i++){
+                output += 'id=' + data[i] + '&'
+            }
+            output+='id=' +data[data.length-1];
+            
         } else if (this.props.type === 'vendor') {
-            Object.keys(data).map((val, ind) => {
-                output += 'id=' + data[val].id + '&'
-            })
+            for(let i = 0;i < data.length-1;i++){
+                output += 'id=' + data[i].id + '&'
+            }
+            output+='id=' + data[data.length-1].id;
         }
         return output;
     }
 
-    popupAction = (id, type, index) => {
+    popupAction = (id,val,index) => {
         let actualItems = this.state.data[index].items;
         let output = '';
-        actualItems.map(val => {
-            output += 'id=' + val.id + '&'
-        })
+        for(let i = 0; i < actualItems.length-1;i++){
+            output += 'id=' + actualItems[i].id + '&'
+        }
+        output+='id=' +actualItems[actualItems.length-1].id;
         this.itemAPICall(output)
     }
 

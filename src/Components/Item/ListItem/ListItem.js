@@ -189,19 +189,34 @@ class ListItem extends Component {
                 if (response.status === 200) {
                     let newData = [...this.state.data];
                     newData.splice(this.state.deleteIndex, 1);
-                    this.setState({
-                        data: newData,
-                        confirmDeleteId: null,
-                        alertMessage: "Delete Item Successfully",
-                        alertVisible: true,
-                        modal: false
-                    })
+                    //this.abc(newData);
+                    if(newData.length === 0){
+                        this.setState({
+                            currentPage:this.state.currentPage - 1,
+                            confirmDeleteId: null,
+                            alertMessage: "Delete Item Successfully",
+                            alertVisible: true,
+                            modal: false
+                        })
+                    }else{
+                        this.setState({
+                            data: newData,
+                            confirmDeleteId: null,
+                            alertMessage: "Delete Item Successfully",
+                            alertVisible: true,
+                            modal: false
+                        })                        
+                    }
+                    this.itemAPICall();
+                   
                 }
             })
             .catch(error => {
                 console.log(error);
             });
     }
+
+    
 
     /**
      * Description: Close Popup Model

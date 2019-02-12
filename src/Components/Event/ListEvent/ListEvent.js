@@ -180,7 +180,6 @@ class ListEvent extends Component {
      * @return {null}
      */
     eventEdit = (id) => {
-        console.log(id);
         this.props.history.push('/editevent/' + id);
     }
 

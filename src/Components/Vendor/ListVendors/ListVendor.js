@@ -344,9 +344,7 @@ class ListVendor extends Component {
                             
                             this.state.itemData && this.state.itemData.map((item, index) => {                                
                                 return this.state.itemPopupData && Object.keys(this.state.itemPopupData).map((val,ind)=>{
-                                    if(this.state.itemPopupData[val].id === item.id){
-                                        return <div key={index}>{item.name}</div>
-                                    }
+                                    return this.state.itemPopupData[val].id === item.id ? <div key={index}>{item.name}</div> : null
                                 })
                             })
                         }

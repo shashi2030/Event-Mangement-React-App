@@ -5,7 +5,7 @@
  * @author Shashi Kapoor Singh
  */
 import React, { Component } from 'react';
-import { Row, Col, Button, Form, FormGroup, Label, Input, FormFeedback, InputGroup, InputGroupAddon } from 'reactstrap';
+import { Row, Col, Button, Form, FormGroup, Label, Input, FormFeedback} from 'reactstrap';
 import { Layout } from '../../Common/Layout/Layout';
 import { vendorActions } from '../../../actions/vendor.actions';
 import { itemActions } from '../../../actions/item.actions';
@@ -75,7 +75,6 @@ class CreateVendor extends Component {
         itemActions
             .listItem()
             .then(response => {
-                console.log(response.data)
                 this.setState({
                     itemData: response.data
                 })

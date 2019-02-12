@@ -15,7 +15,6 @@ const HandleError = (error) => {
             message = CODE.MESSAGES[500];
             break;
         default:
-            console.log("default");
     }
     return message;
 }

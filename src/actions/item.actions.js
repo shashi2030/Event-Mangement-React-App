@@ -21,16 +21,16 @@ export const itemActions = {
 * @param {object} requestData
 * @return {json} req_response
 */
-function listItem (requestData) {
+function listItem (requestData='all') {
     let url = '';
-    if(requestData ===undefined || requestData ==='undefined'){
+    if(requestData === 'all'){
         url=uriConstants.item;
-    }else if(requestData.filterId === 'undefined' || requestData.filterId === undefined){
-        url = uriConstants.item + '?_page=' + requestData.pageNo + '&_limit=' + requestData.pageLimit;
-    }else{
+    }else if(requestData.pageNo !== undefined && requestData.pageLimit !== undefined){
+        url = uriConstants.item + '?_page=' + requestData.pageNo + '&_limit=' + requestData.pageLimit;        
+    }else if(requestData.filterId !== undefined){
         url = uriConstants.item + '?' + requestData.filterId;
     }
-    
+
     return baseService.get(url, Header.JSON(), {}).then(response => {
         return Response(response);
     })
@@ -87,13 +87,4 @@ function viewItem (itemId) {
     return baseService.get(url, Header.JSON(), {}).then(response => {
         return response;
     });
-}
-
-
-function checkVariable(varname){
-    let output = false;
-    if (typeof(varname) != 'undefined' && varname != null){
-            output = true
-        }
-    return output;
 }

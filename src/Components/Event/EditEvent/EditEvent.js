@@ -51,7 +51,7 @@ const eventform = {
     vendorData: {},
     SelectedVendor: {},
     selectedItemData: [],
-    mainvendor : []
+    mainvendor: []
 }
 
 const popupDescription = {
@@ -94,7 +94,6 @@ class EditEvent extends Component {
         const id = this.props.match.params.id;
         eventActions.viewEvent(id).then(response => {
             let newData = response.data;
-            console.log(newData);
             this.setState({
                 ...newData,
                 eventData: response.data
@@ -135,7 +134,7 @@ class EditEvent extends Component {
         this.setState({
             submitted: true
         })
-        let { id,name, date, members, vendor, totalprice, totalcollection, description } = this.state;
+        let { id, name, date, members, vendor, totalprice, totalcollection, description } = this.state;
         let vendordata = {
             name: name,
             date: date,
@@ -145,8 +144,8 @@ class EditEvent extends Component {
             totalcollection: totalcollection,
             description: description
         };
-        if (name && date) {
-            eventActions.editEvent(id,vendordata).then(response => {
+        if (name && date && members.length && vendor.length && totalprice && totalcollection) {
+            eventActions.editEvent(id, vendordata).then(response => {
                 if (response.status === 200) {
                     this.setState({
                         errormessage: "Data Update Successfully",
@@ -196,6 +195,7 @@ class EditEvent extends Component {
                 });
                 this.vendorAPICall();
                 break;
+            default:
         }
     }
     addMember = (type) => {
@@ -221,14 +221,14 @@ class EditEvent extends Component {
      */
     fetchUser = () => {
         this.vendorAPICall(true);
-       
+
         userActions
             .listUser()
             .then(response => {
                 this.setState({
                     membersData: response.data,
                     selectedUserList: this.state.members,
-                    tempMember:this.state.members
+                    tempMember: this.state.members
                 })
             })
             .catch(error => {
@@ -238,9 +238,11 @@ class EditEvent extends Component {
     createIdString = () => {
         let data = this.state.members;
         let output = '';
-        data.map(val => {
-            output += 'id=' + val.id + '&'
-        })
+
+        for (let i = 0; i < data.length - 1; i++) {
+            output += 'id=' + data[i].id + '&'
+        }
+        output += 'id=' + data[data.length - 1].id;
         return output;
     }
 
@@ -273,13 +275,12 @@ class EditEvent extends Component {
      * @return {null}
      */
     vendorAPICall = () => {
-        let data = {}
         vendorActions
-            .listVendor(data)
+            .listVendor()
             .then(response => {
                 let vendorData = {}
                 let SelectedVendor = { ...this.state.SelectedVendor };
-                
+
                 for (let i = 0; i < response.data.length; i++) {
 
                     let itemObj = {}
@@ -295,43 +296,45 @@ class EditEvent extends Component {
                     }
 
                 }
-                SelectedVendor = this.test(response.data)
+                SelectedVendor = this.availableVendor(response.data)
                 this.setState({
                     vendorData: vendorData,
                     SelectedVendor: SelectedVendor,
                     tempSelectedVendor: SelectedVendor,
-                    mainvendor:response.data
+                    mainvendor: response.data
                 })
-                
+
             })
             .catch(error => {
                 console.log(error);
             });
     }
 
-    test(vendorData) {
+    availableVendor(vendorData) {
         let vendord = [...this.state.vendor];
         let newObj = {}
-        var abc = vendord.filter(v=>{
-            vendorData.filter((v1,i)=>{                
-                if(v1.id == v.id){
-                    newObj[v1.vendortype] = {
-                        selectedValue:i,
-                        name:v1.name,
-                        id:v1.id,
-                        items:v1.items
+        for (let a = 0; a < vendord.length; a++) {
+
+            for (var b = 0; b < vendorData.length; b++) {
+                if (vendorData[b].id === parseInt(vendord[a].id)) {
+                    newObj[vendorData[b].vendortype] = {
+                        selectedValue: b,
+                        name: vendorData[b].name,
+                        id: vendorData[b].id,
+                        items: vendorData[b].items
                     }
-                    Object.keys(v1.items).filter(itemv=>{                        
-                        v.items.filter(v=>{                           
-                            if(v == v1.items[itemv].id){
-                                newObj[v1.vendortype].items[itemv].checked = true
+                    let itemv = Object.keys(vendorData[b].items);
+                    for (var c = 0; c < itemv.length; c++) {
+                        for (var d = 0; d < vendord[a].items.length; d++) {
+                            if (vendord[a].items[d] === vendorData[b].items[itemv[c]].id) {
+                                newObj[vendorData[b].vendortype].items[itemv[c]].checked = true
                             }
-                        })
-                    })
+                        }
+                    }
                 }
-            })
-        })
-         return newObj;
+            }
+        }
+        return newObj;
 
     }
     /**
@@ -405,7 +408,7 @@ class EditEvent extends Component {
     selectUser = (e, userObj) => {
         var selectMember = [...this.state.tempMember];
         if (!e.target.checked) {
-            var checkedIndex = selectMember.findIndex(val => val.id == userObj.id);
+            var checkedIndex = selectMember.findIndex(val => val === userObj.id);
             selectMember.splice(checkedIndex, 1);
             this.setState({
                 tempMember: selectMember
@@ -420,7 +423,7 @@ class EditEvent extends Component {
 
     addSelectedMember = () => {
         let selectMember = this.state.tempMember.map(val => {
-            return { id: val.id }
+            return val
         })
         this.setState({
             members: this.state.tempMember,
@@ -439,23 +442,23 @@ class EditEvent extends Component {
         let allUser = [...this.state.data];
         let tempMemberData = [...this.state.tempMember];
         if (e.target.checked) {
-            allUser.filter((value, index) => {
-                if (this.findData(tempMemberData, value.id) === -1) {
-                    tempMemberData.push(value.id);
+            for (let i = 0; i < allUser.length; i++) {
+                if (this.findData(tempMemberData, allUser[i].id) === -1) {
+                    tempMemberData.push(allUser[i].id);
                 }
-            })
+            }
             this.setState({
                 ...this.state,
                 tempMember: tempMemberData
             })
         } else {
-            allUser.filter((value, index) => {
-                tempMemberData.filter((val, ind) => {
-                    if (value.id === val) {
-                        tempMemberData.splice(ind, 1)
+            for (let i = 0; i < allUser.length; i++) {
+                for (let a = 0; a < tempMemberData.length; a++) {
+                    if (allUser[i].id === tempMemberData[a]) {
+                        tempMemberData.splice(a, 1)
                     }
-                })
-            })           
+                }
+            }
             this.setState({
                 tempMember: tempMemberData
             })
@@ -486,14 +489,27 @@ class EditEvent extends Component {
 
     handleChangeVendor = (type, e, itemsData) => {
         let data = { ...this.state.tempSelectedVendor }
+
         let itemIndex = this.state.vendorData[type].findIndex(item => {
-            return item.id == e.target.selectedOptions[0].id
+            return item.id === parseInt(e.target.selectedOptions[0].id)
         })
-        data[type] = { "selectedValue": e.target.selectedIndex - 1, name: e.target.selectedOptions[0].value, id: e.target.selectedOptions[0].id, items: this.state.vendorData[type][itemIndex].items }
+
+        if (e.target.selectedIndex !== 0) {
+            data[type] = { "selectedValue": e.target.selectedIndex - 1, name: e.target.selectedOptions[0].value, id: e.target.selectedOptions[0].id, items: this.state.vendorData[type][itemIndex].items }
+        } else {
+            delete data[type]
+        }
         this.setState({
             ...this.state,
             tempSelectedVendor: data
         })
+    }
+    selectedVendorList = (id) => {
+        let tempVendor = this.state.tempSelectedVendor;
+        let isActive = Object.keys(tempVendor).filter(val => {
+            return parseInt(tempVendor[val].id) === id
+        })
+        return isActive.length ? true : false;
     }
     addSelectedVendor = () => {
         let tempselectedvendor = { ...this.state.tempSelectedVendor };
@@ -535,17 +551,18 @@ class EditEvent extends Component {
         let itemcheckbox = []
         let items = this.state.tempSelectedVendor[type].items;
         let itemlist = this.state.itemData;
-        itemlist.filter(item => {
-            Object.keys(this.state.tempSelectedVendor[type].items).filter((value, ind) => {
-                if (items[value].id == item.id) {
-                    itemcheckbox.push(<FormGroup check inline key={"item" + ind}>
+        for (let i = 0; i < itemlist.length; i++) {
+            let itemD = Object.keys(this.state.tempSelectedVendor[type].items);
+            for (let a = 0; a < itemD.length; a++) {
+                if (items[itemD[a]].id === itemlist[i].id) {
+                    itemcheckbox.push(<FormGroup check inline key={"item" + a}>
                         <Label check>
-                            <Input type="checkbox" id={item.id} checked={this.state.tempSelectedVendor[type].items[ind].checked} onChange={(e) => this.itemOnChange(e, type, ind)} /> {item.name}
+                            <Input type="checkbox" id={itemlist[i].id} checked={this.state.tempSelectedVendor[type].items[a].checked} onChange={(e) => this.itemOnChange(e, type, a)} /> {itemlist[i].name}
                         </Label>
                     </FormGroup>)
                 }
-            })
-        })
+            }
+        }
         return itemcheckbox;
     }
 
@@ -582,7 +599,7 @@ class EditEvent extends Component {
                                                 <option>None</option>
                                                 {
                                                     this.state.vendorData[value].map((val, ind) => {
-                                                        return <option key={ind} id={val.id} >{val.name}</option>
+                                                        return <option key={ind} id={val.id} selected={this.selectedVendorList(val.id)}>{val.name}</option>
                                                     })
                                                 }
 
@@ -600,27 +617,11 @@ class EditEvent extends Component {
                     </div>
                 )
                 break;
+            default:
         }
         return renderData;
     }
 
-    handleChangeItem = (e) => {
-        let { name, id } = e.target;
-        let selectedItem = [...this.state.selectedItemData]
-        if (e.target.checked) {
-            selectedItem.push({ name: name, id: id });
-            this.setState({
-                selectedItemData: selectedItem
-            })
-        } else {
-            var checkedIndex = selectedItem.findIndex(val => val.id == id);
-            selectedItem.splice(checkedIndex, 1);
-            this.setState({
-                selectedItemData: selectedItem
-            })
-        }
-
-    }
 
     /**
      * render to html
@@ -628,9 +629,8 @@ class EditEvent extends Component {
      * @return {Object}
      */
     render() {
-        console.log(this.state)
-        const { id, name, date, members, vendors, items, totalprice, totalcollection, selectedItemData, SelectedVendor, description, submitted, errormessage } = this.state;
-        
+        const { id, name, date, members, vendors, items, totalprice, totalcollection, SelectedVendor, description, submitted, errormessage } = this.state;
+
         const breadcrumbdata = [
             {
                 "id": "home",
@@ -692,18 +692,15 @@ class EditEvent extends Component {
                                 <Label for="members" sm={3}>Members</Label>
                                 <Col sm={9}>
                                     <button type="button" onClick={() => this.addMember('member')}><i className="fa fa-user-plus" aria-hidden="true"></i></button>
-                                    
                                     {
                                         members.length ?
                                             <ul className="member-list">
-                                            {this.state.membersData && this.state.membersData.map((value,i)=>{
-                                                return members && members.map((v, index) => {
-                                                    if(value.id == v){
-                                                        return <li key={index}>{value.username} <i className="fa fa-times" aria-hidden="true" onClick={() => this.deleteMember(index, value.id)}></i></li>
-                                                    }
-                                                })
-                                                
-                                            })}
+                                                {this.state.membersData && this.state.membersData.map((value, i) => {
+                                                    return members && members.map((v, index) => {
+                                                        return value.id === v ? <li key={index}>{value.username} <i className="fa fa-times" aria-hidden="true" onClick={() => this.deleteMember(index, value.id)}></i></li> : null
+                                                    })
+
+                                                })}
                                             </ul> : null
                                     }
                                     {submitted && members.length === 0 && <div className="custom-error invalid-feedback">Select Member.</div>}
@@ -719,7 +716,7 @@ class EditEvent extends Component {
                                                 {
                                                     SelectedVendor && Object.keys(SelectedVendor).map((value, index) => {
                                                         return <li key={index}> <label>{value} : </label> <span>{SelectedVendor[value].name}</span> <i className="fa fa-times" aria-hidden="true" onClick={() => this.deleteVendor(value)} ></i></li>
-                                                       
+
                                                     })
                                                 }
                                             </ul> : null

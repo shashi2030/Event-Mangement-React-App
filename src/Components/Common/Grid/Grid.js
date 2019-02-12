@@ -49,7 +49,7 @@ class Grid extends Component {
 
     findSelectedId =(id)=>{
          let selectedUserList = this.props.tempMember;
-         let matchData = selectedUserList.findIndex(val => val==id);
+         let matchData = selectedUserList.findIndex(val => val===id);
          return matchData === -1?false:true;
     }
 
